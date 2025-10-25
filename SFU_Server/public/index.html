@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mediasoup Multi-Client Test</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/modules/mediasoupclient.min.js"></script>
+    <style>
+        body {
+            background: #111;
+            color: #eee;
+            font-family: sans-serif;
+        }
+
+        video {
+            width: 240px;
+            height: 180px;
+            margin: 5px;
+            background: #333;
+            border-radius: 8px;
+        }
+
+        #videos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Mediasoup Multi-Client Test</h2>
+    <div id="videos"></div>
+
+    <script>
+        const socket = io();
+        const videos = document.getElementById("videos");
+
+        let device, producerTransport, consumerTransport;
+        let producers = new Map();
+        let consumers = new Map();
+
+        const meetingId = "my-room";
+
+        // -------- Join meeting ----------
+        async function joinMeeting() {
+            return new Promise(resolve => {
+                socket.emit("join-meeting", { meetingId }, res => resolve(res));
+            });
+        }
+
+        // -------- Load Device ----------
+        async function loadDevice(routerRtpCapabilities) {
+            device = new mediasoupClient.Device();
+            await device.load({ routerRtpCapabilities });
+        }
+
+        // -------- Create Transport ----------
+        async function createTransport(type) {
+            return new Promise(resolve => {
+                socket.emit("createWebRtcTransport", { type }, (data) => resolve(data));
+            });
+        }
+
+        // -------- Init Transports ----------
+        async function initTransports() {
+            const sendParams = await createTransport("producer");
+            const recvParams = await createTransport("consumer");
+            console.log(sendParams);
+
+            // Lấy ra params thực sự
+            const { id: sendId, iceParameters: sendIceParameters, iceCandidates: sendIceCandidates, dtlsParameters: sendDtlsParameters } = sendParams.params;
+            const { id: recvId, iceParameters: recvIceParameters, iceCandidates: recvIceCandidates, dtlsParameters: recvDtlsParameters } = recvParams.params;
+
+            // Tạo Send Transport
+            producerTransport = device.createSendTransport({
+                id: sendId,
+                iceParameters: sendIceParameters,
+                iceCandidates: sendIceCandidates,
+                dtlsParameters: sendDtlsParameters
+            });
+
+            producerTransport.on("connect", ({ dtlsParameters }, callback) => {
+                socket.emit("connectTransport", { transportId: producerTransport.id, dtlsParameters }, callback);
+            });
+
+            producerTransport.on("produce", ({ kind, rtpParameters }, callback) => {
+                socket.emit("produce", { producerTransportId: producerTransport.id, kind, rtpParameters }, ({ producerId }) => {
+                    callback({ id: producerId });
+                    producers.set(producerId, { kind });
+                });
+            });
+
+            // Tạo Recv Transport
+            consumerTransport = device.createRecvTransport({
+                id: recvId,
+                iceParameters: recvIceParameters,
+                iceCandidates: recvIceCandidates,
+                dtlsParameters: recvDtlsParameters
+            });
+
+            consumerTransport.on("connect", ({ dtlsParameters }, callback) => {
+                socket.emit("connectTransport", { transportId: consumerTransport.id, dtlsParameters }, callback);
+            });
+        }
+
+        // -------- Produce video ----------
+        async function produce() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            const track = stream.getVideoTracks()[0];
+            if (!device.canProduce("video")) return;
+
+            const producer = await producerTransport.produce({
+                track,
+                encodings: [
+                    { rid: "r0", maxBitrate: 100000 },
+                    { rid: "r1", maxBitrate: 300000 },
+                    { rid: "r2", maxBitrate: 900000 }
+                ],
+                codecOptions: { videoGoogleStartBitrate: 1000 }
+            });
+
+            const localVideo = document.createElement("video");
+            localVideo.srcObject = stream;
+            localVideo.autoplay = true;
+            localVideo.muted = true;
+            localVideo.id = "local";
+            videos.appendChild(localVideo);
+
+            producer.on("transportclose", () => { localVideo.remove(); producers.delete(producer.id); });
+        }
+
+        // -------- Consume ----------
+        async function consume(producerId, kind) {
+            socket.emit("consume", {
+                producerId,
+                rtpCapabilities: device.rtpCapabilities,
+                consumerTransportId: consumerTransport.id,
+                kind: kind
+            }, async ({ id, kind, rtpParameters }) => {
+                if (!id) return;
+
+                const consumer = await consumerTransport.consume({ id, producerId, kind, rtpParameters });
+                consumers.set(producerId, consumer);
+
+                console.log(id, rtpParameters, kind);
+                
+
+                const stream = new MediaStream([consumer.track]);
+                const video = document.createElement("video");
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.id = producerId;
+                videos.appendChild(video);
+
+                socket.emit("resume", { consumerId: consumer.id });
+            });
+        }
+
+        // -------- Socket events ----------
+        socket.on("newProducer", async ({ producerId, kind }) => { await consume(producerId, kind); });
+        socket.on("producerClosed", ({ producerId }) => {
+            const video = document.getElementById(producerId);
+            if (video) video.remove();
+            consumers.delete(producerId);
+        });
+
+        // -------- Start ----------
+        (async () => {
+            await joinMeeting();
+
+            socket.emit("getRouterRtpCapabilities", null, async (routerRtpCapabilities) => {
+                await loadDevice(routerRtpCapabilities);
+                await initTransports();
+                await produce();
+
+                socket.emit("getProducers", null, async (data) => {
+                    for (const { producerId } of data) await consume(producerId);
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>
