@@ -1,17 +1,5 @@
-import { mediasoup } from "./mediasoup.config.js";
-import util from "util";
+import { mediasoup } from "./media/mediasoup.config.js";
 
-export const createRouter = async (worker, optionRouters) => {
-    const router = {
-        workerId: worker.pid,
-        router: await worker.createRouter(optionRouters),
-    };
-    return router;
-};
-
-export const getRouterRtpCapabilities = async (router) => {
-    return router.rtpCapabilities;
-};
 
 export const createWebRtcTransport = async (router) => {
     const { maxIncomingBitrate } = mediasoup;
@@ -49,10 +37,8 @@ export const createConsumer = async ({ transport, producerId, rtpCapabilities, i
         paused: isVideo
     });
 
-
     return consumer;
 };
-
 
 export const setPreferredLayers = async ({ consumer, spatialLayer, temporalLayer }) => {
     try {

@@ -145,9 +145,6 @@
                 const consumer = await consumerTransport.consume({ id, producerId, kind, rtpParameters });
                 consumers.set(producerId, consumer);
 
-                console.log(id, rtpParameters, kind);
-                
-
                 const stream = new MediaStream([consumer.track]);
                 const video = document.createElement("video");
                 video.srcObject = stream;
@@ -161,6 +158,8 @@
 
         // -------- Socket events ----------
         socket.on("newProducer", async ({ producerId, kind }) => { await consume(producerId, kind); });
+
+
         socket.on("producerClosed", ({ producerId }) => {
             const video = document.getElementById(producerId);
             if (video) video.remove();

@@ -1,15 +1,18 @@
 import Participant from "./Participant.js";
-import util from "util";
 
-import { getRouterRtpCapabilities } from "../src/router.js";
+import { getRouterRtpCapabilities } from "../router.js";
 
 export default class Meeting {
     routers = new Map();
+    currentRouter = "";
     constructor(router) {
         this.router = router;
         this.participants = new Map();
         this.routers.set(router.router.id, this.router);
-        this.lastRouter = router.router.id;
+    }
+
+    setCurrentRouter(routerId) {
+        this.currentRouter = routerId;
     }
 
     addParticipant(socketId, routerId) {
@@ -42,9 +45,9 @@ export default class Meeting {
     async createProducer({ socketId, producerTransportId, rtpParameters, kind }) {
         const participant = this.participants.get(socketId);
         
-        const producerId = await participant.createProducer({ producerTransportId, rtpParameters, kind });
+        const { producerId, routerId } = await participant.createProducer({ producerTransportId, rtpParameters, kind });
         
-        return producerId;
+        return { producerId, routerId };
     }
 
     async createConsumer({ socketId, consumerTransportId, rtpCapabilities, producerId, kind }) {
@@ -62,4 +65,3 @@ export default class Meeting {
     }
 
 }
-

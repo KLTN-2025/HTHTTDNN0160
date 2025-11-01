@@ -1,13 +1,17 @@
-import { createWebRtcTransport, connectTransport, createProducer, createConsumer, setPreferredLayers } from "../src/router.js";
-import util from "util";
+import { createWebRtcTransport, connectTransport, createProducer, createConsumer, setPreferredLayers } from "../router.js";
 
 export default class Participant {
     routerId = "";
     transports = new Map();
     producers = new Map();
     consumers = new Map();
+    
     constructor(routerId) {
         this.routerId = routerId;
+    }
+
+    async checkRouter(routerId) {
+        return routerId === this.routerId;
     }
 
     async createWebRtcTransport(router) {
@@ -74,13 +78,12 @@ export default class Participant {
             console.log(`Producer ${producer.id} closed`);
         });
 
-        return { producerId: producer.id };
+        return { producerId: producer.id, routerId: this.routerId };
     }
 
     async createConsumer({ consumerTransportId, rtpCapabilities, producerId, kind }) {
         const transport = this.transports.get(consumerTransportId);
         const isVideo = kind === "video";
-        console.log("kind", kind);
         
         let consumer = null;
         try {

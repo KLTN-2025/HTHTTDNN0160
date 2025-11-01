@@ -2,7 +2,6 @@ import os from "os";
 
 const ifaces = os.networkInterfaces();
 
-
 const getLocalIp = () => {
     let localIp = "127.0.0.1";
     Object.keys(ifaces).forEach((ifname) => {
