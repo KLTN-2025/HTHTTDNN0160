@@ -1,4 +1,5 @@
-import { createWebRtcTransport, connectTransport, createProducer, createConsumer, setPreferredLayers } from "../router.js";
+import { connectTransport, createConsumer, createProducer, createWebRtcTransport, setPreferredLayers } from "../media/handlers/transport.handler.js";
+
 
 export default class Participant {
     routerId = "";
@@ -33,7 +34,7 @@ export default class Participant {
         });
 
         transport.on('iceselectedtuplechange', (tuple) => {
-            console.log(`[ICE SELECTED] ${transport.id}`, tuple);
+            // console.log(`[ICE SELECTED] ${transport.id}`, tuple);
         });
 
         transport.on('close', () => {

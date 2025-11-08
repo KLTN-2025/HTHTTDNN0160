@@ -1,9 +1,9 @@
 import { mediasoup as mediasoupConfig } from "../mediasoup.config.js";
 import mediasoup from "mediasoup";
 
-const workers = [];
+export const workers = [];
 
-const MAX_USERS_WORKER = 20;
+const MAX_USERS_WORKER = 1;
 
 export const createWorkers = async () => {
     for (let i = 0; i < mediasoupConfig.mediasoup.numberWorkers; i++) {
@@ -21,11 +21,15 @@ export const createWorkers = async () => {
     }
 }
 
+export const getWorker = (workerId) => {
+    return workers.find(worker => worker.worker.pid === workerId);
+}
+
 export const findWorkerFeasible = async () => {
     const leastLoaded = workers.reduce((min, curr) => {
         return curr.numUsers < min.numUsers ? curr : min;
     });
-    return leastLoaded.worker;
+    return leastLoaded;
 };
 
 export const checkWorkerCurrentUsaged = (workerId) => {

@@ -53,6 +53,8 @@
 
         // -------- Load Device ----------
         async function loadDevice(routerRtpCapabilities) {
+            console.log(routerRtpCapabilities);
+            
             device = new mediasoupClient.Device();
             await device.load({ routerRtpCapabilities });
         }
@@ -108,9 +110,14 @@
 
         // -------- Produce video ----------
         async function produce() {
+            
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
             const track = stream.getVideoTracks()[0];
-            if (!device.canProduce("video")) return;
+            if (!device.canProduce("video")) {
+                console.log("error here produce", device);
+
+                return
+            };
 
             const producer = await producerTransport.produce({
                 track,
@@ -129,16 +136,20 @@
             localVideo.id = "local";
             videos.appendChild(localVideo);
 
+            console.log("start produce");
+
+
             producer.on("transportclose", () => { localVideo.remove(); producers.delete(producer.id); });
         }
 
         // -------- Consume ----------
-        async function consume(producerId, kind) {
+        async function consume(producerId, kind, socketId) {
             socket.emit("consume", {
                 producerId,
                 rtpCapabilities: device.rtpCapabilities,
                 consumerTransportId: consumerTransport.id,
-                kind: kind
+                kind: kind,
+                socketId: socketId
             }, async ({ id, kind, rtpParameters }) => {
                 if (!id) return;
 
@@ -157,7 +168,7 @@
         }
 
         // -------- Socket events ----------
-        socket.on("newProducer", async ({ producerId, kind }) => { await consume(producerId, kind); });
+        socket.on("newProducer", async ({ producerId, kind, socketId }) => { await consume(producerId, kind, socketId); });
 
 
         socket.on("producerClosed", ({ producerId }) => {

@@ -1,4 +1,4 @@
-import { mediasoup } from "./media/mediasoup.config.js";
+import { mediasoup } from "../mediasoup.config.js";
 
 
 export const createWebRtcTransport = async (router) => {
