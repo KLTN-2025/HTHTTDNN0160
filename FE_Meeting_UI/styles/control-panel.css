@@ -19,11 +19,74 @@
 }
 
 .device-control-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+}
 
+.device-control-section button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 45px;
+    border: none;
+    background-color: #414345;
+}
+
+.device-control-section button:hover {
+    background-color: #575a5e;
+}
+
+.device-control-section img {
+    height: 20px;
+    filter: brightness(1) invert(1);
+}
+
+.device-control-section .toggle-device {
+    width: 85px;
+    background-color: rgba(255, 141, 141, 0.267);
+    height: 45px;
+    border-radius: 25px;
+}
+
+.device-control-section .toggle-device.cam img {
+    height: 26px;
+}
+
+.device-control-section .toggle-device.on {
+    background-color: #2e3031;
+}
+
+.device-control-section .toggle-device.on button {
+    transform: translateX(87%);
+}
+
+.device-control-section .toggle-device button {
+    width: 45px;
+    border-radius: 50%;
+}
+
+.device-control-section .btn-common {
+    width: 45px;
+    border-radius: 25px;
+}
+
+.device-control-section .btn-common.slide-show img {
+    filter: brightness(0) invert(1);
+}
+
+.device-control-section .btn-common.emoji img {
+    width: 29px;
+    height: 29px;
+    margin-bottom: 4.5px;
+    margin-right: 0.1px;
 }
 
 .user-control-section {
     margin-right: 12px;
     color: white;
-
 }

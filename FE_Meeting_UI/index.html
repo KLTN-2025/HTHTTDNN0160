@@ -18,10 +18,16 @@
 </head>
 
 <body>
-    <section>
+    <section class="main">
 
         <div class="content-panel">
+
+            <div class="video-main">
+                <img src="images/main-image.jfif" alt="">
+            </div>
+
             <div class="video-panel">
+
                 <div class="video-container">
                     <div class="video">
 
@@ -108,16 +114,18 @@
                         <img class="mic-icon" src="icons/mic-icon.svg" alt="Icon mic user">
                     </div>
                 </div>
+
             </div>
 
             <div class="info-panel">
-
+                <div class="info-content">
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Facere libero natus, quisquam qui tempore
+                    fugit eos sapiente fuga error reprehenderit nostrum non sequi vitae expedita quaerat deserunt quo
+                    esse quod.
+                </div>
             </div>
         </div>
 
-    </section>
-
-    <section>
         <div class="control-panel">
             <div class="info-control-section">
                 <span>Time Start: 12:00 AM</span>
@@ -125,12 +133,45 @@
                 <span>Title Meeting</span>
             </div>
             <div class="device-control-section">
-                
+                <div class="toggle-device">
+                    <button class="mic-btn">
+                        <img src="icons/mic-slash-icon.svg" alt="">
+                    </button>
+                </div>
+                <div class="toggle-device on cam">
+                    <button class="cam-btn">
+                        <img src="icons/camera-icon.svg" alt="">
+                    </button>
+                </div>
+                <button class="btn-common slide-show">
+                    <img src="icons/slide-show-icon.svg" alt="">
+                </button>
+                <button class="btn-common emoji">
+                    <img src="icons/emoji-icon.svg" alt="">
+                </button>
+                <button class="btn-common">
+                    <img src="icons/caption-icon.svg" alt="">
+                </button>
+                <button></button>
             </div>
             <div class="user-control-section">123</div>
         </div>
+
     </section>
 
+    <script>
+        const btn = document.getElementById("test");
+
+        btn.addEventListener("click", () => {
+            document.querySelector(".info-panel").classList.toggle("show");
+            document.querySelector(".video-main").classList.toggle("present");
+            document.querySelector(".video-panel").classList.toggle("present");
+            document.querySelectorAll(".video-container").forEach(v => {
+                v.classList.toggle("present")
+            });
+
+        })
+    </script>
 </body>
 
 </html>

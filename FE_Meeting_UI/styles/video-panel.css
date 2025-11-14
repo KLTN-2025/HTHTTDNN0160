@@ -1,11 +1,20 @@
 .video-panel {
-    flex: 8;
+    flex: 7;
     height: 100%;
     width: 100%;
     border-radius: 12px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 6px;
+    transition: flex 0.8s;
+}
+
+.video-panel.present {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-left: 12px;
 }
 
 .video-container {
@@ -13,6 +22,10 @@
     height: 100%;
     border-radius: 12px;
     position: relative;
+}
+
+.video-container.present {
+    height: 120px;
 }
 
 .avatar-placeholder {
