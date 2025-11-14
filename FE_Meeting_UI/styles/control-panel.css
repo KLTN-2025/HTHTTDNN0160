@@ -1,0 +1,29 @@
+.control-panel {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.info-control-section {
+    margin-left: 12px;
+    color: white;
+    font-size: 14px;
+}
+
+.info-control-section img {
+    height: 10px;
+    filter: brightness(0) invert(1);
+}
+
+.device-control-section {
+
+}
+
+.user-control-section {
+    margin-right: 12px;
+    color: white;
+
+}

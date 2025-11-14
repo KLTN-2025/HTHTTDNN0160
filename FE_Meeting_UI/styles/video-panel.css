@@ -1,0 +1,74 @@
+.video-panel {
+    flex: 8;
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.video-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    position: relative;
+}
+
+.avatar-placeholder {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+}
+
+.avatar-background-color {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    background: radial-gradient(circle, #0f5f64 0%, #0b3f42 50%, #082d2f 100%);
+    position: relative;
+}
+
+.avatar-background-color .avatar-name-user {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    height: 80px;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.video-container .name-user {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    font-size: 14px;
+    color: white;
+}
+
+.video-container .icon-audio-stage {
+    background: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-container .icon-audio-stage .mic-icon {
+    height: 20px;
+    width: 20px;
+    filter: brightness(0) invert(1);
+}

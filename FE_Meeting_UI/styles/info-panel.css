@@ -1,0 +1,7 @@
+.info-panel {
+    flex: 2;
+    background-color: yellow;
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+}

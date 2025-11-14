@@ -1,0 +1,8 @@
+.content-panel {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 12px 0 12px;
+    display: flex;
+    gap: 12px;
+}
