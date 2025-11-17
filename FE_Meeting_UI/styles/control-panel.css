@@ -3,11 +3,11 @@
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     user-select: none;
 }
 
 .info-control-section {
+    flex: 1;
     margin-left: 12px;
     color: white;
     font-size: 14px;
@@ -25,6 +25,7 @@
     justify-content: center;
     gap: 10px;
     height: 100%;
+    flex: 2;
 }
 
 .device-control-section button {
@@ -63,6 +64,11 @@
 
 .device-control-section .toggle-device.on button {
     transform: translateX(87%);
+    background-color: #A8C7FA;
+}
+
+.device-control-section .toggle-device.on button:hover {
+    background-color: #87a1ca;
 }
 
 .device-control-section .toggle-device button {
@@ -77,6 +83,7 @@
 
 .device-control-section .btn-common.slide-show img {
     filter: brightness(0) invert(1);
+    margin-left: 2px;
 }
 
 .device-control-section .btn-common.emoji img {
@@ -86,7 +93,128 @@
     margin-right: 0.1px;
 }
 
+.device-control-section .btn-common.hand-up img {
+    width: 25.5px;
+    height: 25.5px;
+}
+
+.device-control-section .feature-more {
+    position: relative;
+}
+
+.device-control-section .feature-more .btn-more {
+    padding: 0;
+    border-radius: 15px;
+}
+
+.device-control-section .feature-more .btn-more img {
+    height: 28px;
+}
+
+.device-control-section .feature-more .feature-option {
+    position: absolute;
+    left: 0px;
+    bottom: 130%;
+    height: max-content;
+    width: 300px;
+    background-color: #242425;
+    border-radius: 8px;
+    display: none;
+}
+
+.device-control-section .feature-more .feature-option .title {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.795);
+}
+
+.device-control-section .feature-more .feature-option .feature {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    color: rgba(255, 255, 255, 0.795);
+    cursor: pointer;
+    padding-left: 15px;
+    align-items: center;
+}
+
+.device-control-section .feature-more .feature-option .feature img {
+    margin-right: 16px;
+}
+
+.device-control-section .feature-more .feature-option .feature:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.device-control-section .feature-more .feature-option .feature:hover {
+    background-color: #636368;
+}
+
+.device-control-section .feature-more .feature-option .separater {
+    width: 100%;
+    border-bottom: 2px gray solid;
+}
+
 .user-control-section {
     margin-right: 12px;
     color: white;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+    height: 100%;
+}
+
+.user-control-section button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 45px;
+    border: none;
+    background-color: #414345;
+}
+
+.user-control-section button:hover {
+    background-color: #575a5e;
+}
+
+.user-control-section img {
+    height: 20px;
+    filter: brightness(0) invert(1);
+}
+
+.user-control-section .btn-common {
+    width: 45px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.user-control-section .btn-common .count {
+    position: absolute;
+    left: 60%;
+    bottom: 75%;
+    background-color: red;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-control-section .btn-common.chat img {
+    height: 26px;
+}
+
+.user-control-section .btn-common.user img {
+    height: 24px;
 }
