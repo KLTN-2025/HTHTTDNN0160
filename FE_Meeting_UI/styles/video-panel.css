@@ -4,7 +4,7 @@
     width: 100%;
     border-radius: 12px;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
     transition: flex 0.8s;
 }

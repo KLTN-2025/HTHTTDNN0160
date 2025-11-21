@@ -8,7 +8,7 @@ body {
 }
 
 body {
-    font-family: Inter, Roboto, Arial, sans-serif;
+    font-family: "Google Sans Flex", Roboto, Arial, sans-serif;
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -16,8 +16,13 @@ body {
     background-color: black;
 }
 
+img {
+    display: block;
+}
+
 .main {
     display: grid;
-    grid-template-rows: 1fr 80px;
+    grid-template-rows: 1fr auto;
     height: 100%;
 }
+

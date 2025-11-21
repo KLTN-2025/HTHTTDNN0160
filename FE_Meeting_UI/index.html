@@ -8,13 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles/general.css">
     <link rel="stylesheet" href="styles/content-panel.css">
     <link rel="stylesheet" href="styles/info-panel.css">
     <link rel="stylesheet" href="styles/video-panel.css">
     <link rel="stylesheet" href="styles/control-panel.css">
+    <link rel="stylesheet" href="styles/emoji-section.css">
+    <link rel="stylesheet" href="styles/caption-section.css">
 </head>
 
 <body>
@@ -23,7 +25,26 @@
         <div class="content-panel">
 
             <div class="video-main">
-                <img src="images/main-image.jfif" alt="">
+                <div class="video-container">
+                    <div class="video">
+
+                    </div>
+
+                    <div class="avatar-placeholder">
+                        <div class="avatar-background-color">
+                            <div class="avatar-name-user">U</div>
+                        </div>
+                        <div class="avatar-profile-picture">
+                            <img src="" alt="">
+                        </div>
+                    </div>
+
+                    <div class="name-user">user name</div>
+
+                    <div class="icon-audio-stage">
+                        <img class="mic-icon" src="icons/mic-icon.svg" alt="Icon mic user">
+                    </div>
+                </div>
             </div>
 
             <div class="video-panel">
@@ -48,7 +69,6 @@
                         <img class="mic-icon" src="icons/mic-icon.svg" alt="Icon mic user">
                     </div>
                 </div>
-
                 <div class="video-container">
                     <div class="video">
 
@@ -126,6 +146,43 @@
             </div>
         </div>
 
+        <div class="emoji-section">
+            <div class="emoji">
+                <button>
+                    <span>💖</span>
+                </button>
+                <button>
+                    <span>👍</span>
+                </button>
+                <button>
+                    <span>🎉</span>
+                </button>
+                <button>
+                    <span>👋</span>
+                </button>
+                <button>
+                    <span>😂</span>
+                </button>
+                <button>
+                    <span>😮</span>
+                </button>
+                <button>
+                    <span>😥</span>
+                </button>
+                <button>
+                    <span>🤔</span>
+                </button>
+                <button>
+                    <span>👎</span>
+                </button>
+            </div>
+        </div>
+
+
+        <div class="caption-section"></div>
+
+
+
         <div class="control-panel">
             <div class="info-control-section">
                 <span>Time Start: 12:00 AM</span>
@@ -133,31 +190,79 @@
                 <span>Title Meeting</span>
             </div>
             <div class="device-control-section">
+                <div class="box-option">
+                    <button class="box-option-item">
+                        <img src="icons/mic-icon.svg" alt="">
+                        <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate</span>
+                        <img src="icons/up-arrow-icon.svg" alt="">
+                    </button>
+                    <button class="box-option-item">
+                        <img src="icons/speaker-icon.svg" alt="">
+                        <span>Lorem ipsum dolor sit amet, consectetur</span>
+                        <img src="icons/up-arrow-icon.svg" alt="">
+                    </button>
+                    <button class="btn-setting">
+                        <img src="icons/setting-icon.svg" alt="">
+                    </button>
+                    <div class="list-option">
+                        <div class="item">
+                            <div class="icon-tick">
+                                <img src="icons/camera-icon.svg" alt="">
+                            </div>
+                            <p>123</p>
+                        </div>
+                        <div class="item">
+                            <div class="icon-tick">
+                                <img src="icons/camera-icon.svg" style="display: none;" alt="">
+                            </div>
+                            <p>123</p>
+                        </div>
+                        <div class="item">
+                            <div class="icon-tick">
+                                <img src="icons/camera-icon.svg" style="display: none;" alt="">
+                            </div>
+                            <p>123</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="toggle-device">
-                    <button class="mic-btn">
+                    <button class="device-btn">
                         <img src="icons/mic-slash-icon.svg" alt="">
+                        <div class="tooltip">Turn On Camera</div>
+                    </button>
+                    <button class="option-device-btn">
+                        <img src="icons/up-arrow-icon.svg" alt="">
                     </button>
                 </div>
                 <div class="toggle-device on cam">
-                    <button class="cam-btn">
+                    <button class="device-btn">
                         <img src="icons/camera-icon.svg" alt="">
+                        <div class="tooltip">Turn On Camera</div>
+                    </button>
+                    <button class="option-device-btn">
+                        <img src="icons/up-arrow-icon.svg" alt="">
                     </button>
                 </div>
                 <button class="btn-common slide-show">
                     <img src="icons/slide-show-icon.svg" alt="">
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
-                <button class="btn-common emoji">
+                <button id="emoji" class="btn-common emoji">
                     <img src="icons/emoji-icon.svg" alt="">
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
-                <button class="btn-common">
+                <button id="caption" class="btn-common">
                     <img src="icons/caption-icon.svg" alt="">
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
                 <button class="btn-common hand-up">
                     <img src="icons/hand-up-icon.svg" alt="">
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
                 <div class="feature-more">
                     <button class="btn-more">
                         <img src="icons/more-icon.svg" alt="">
+                        <div class="tooltip">Turn On Camera</div>
                     </button>
                     <div class="feature-option">
                         <div class="title">Tính Năng</div>
@@ -193,22 +298,39 @@
                         </div>
                     </div>
                 </div>
+                <div class="option-cancel has-option">
+                    <button class="btn-cancel">
+                        <img src="icons/call-decline-icon.svg" alt="">
+                        <div class="tooltip">Turn On Camera</div>
+                    </button>
+                    <button class="btn-cancel-option">
+                        <img src="icons/up-arrow-icon.svg" alt="">
+                        <div class="tooltip">Turn On Camera</div>
+                    </button>
+                </div>
             </div>
             <div class="user-control-section">
                 <button class="btn-common">
                     <img src="icons/" alt="">
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
                 <button class="btn-common user">
                     <img src="icons/users-icon.svg" alt="">
                     <div class="count">
                         9+
                     </div>
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
                 <button class="btn-common chat">
                     <img src="icons/chat-icon.svg" alt="">
+                    <div class="count">
+                        9+
+                    </div>
+                    <div class="tooltip">Turn On Camera</div>
                 </button>
                 <button class="btn-common">
                     <img src="icons/" alt="">
+                    <div class="tooltip close-edge-right">Turn On Camera</div>
                 </button>
             </div>
         </div>
@@ -217,6 +339,19 @@
 
     <script>
         const btn = document.getElementById("test");
+        const btnEmoji = document.querySelector("#emoji");
+        const btnCaption = document.querySelector("#caption");
+        const caption = document.querySelector(".caption-section");
+        const emoji = document.querySelector(".emoji-section");
+
+
+        btnEmoji.addEventListener("click", () => {
+            emoji.classList.toggle("show-emoji");
+        })
+
+        btnCaption.addEventListener("click", () => {
+            caption.classList.toggle("show-caption");
+        })
 
         btn.addEventListener("click", () => {
             document.querySelector(".info-panel").classList.toggle("show");

@@ -1,0 +1,9 @@
+.caption-section {
+  overflow: hidden;
+  height: 0;
+  transition: height 0.3s ease;
+}
+
+.caption-section.show-caption {
+  height: 150px;
+}
