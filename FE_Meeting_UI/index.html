@@ -139,12 +139,13 @@
 
             <div class="info-panel">
                 <div class="info-content">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Facere libero natus, quisquam qui tempore
-                    fugit eos sapiente fuga error reprehenderit nostrum non sequi vitae expedita quaerat deserunt quo
-                    esse quod.
+                    
                 </div>
             </div>
         </div>
+
+        <div class="caption-section"></div>
+
 
         <div class="emoji-section">
             <div class="emoji">
@@ -177,10 +178,6 @@
                 </button>
             </div>
         </div>
-
-
-        <div class="caption-section"></div>
-
 
 
         <div class="control-panel">
@@ -314,14 +311,14 @@
                     <img src="icons/" alt="">
                     <div class="tooltip">Turn On Camera</div>
                 </button>
-                <button class="btn-common user">
+                <button id="btn-user" class="btn-common user">
                     <img src="icons/users-icon.svg" alt="">
                     <div class="count">
                         9+
                     </div>
                     <div class="tooltip">Turn On Camera</div>
                 </button>
-                <button class="btn-common chat">
+                <button id="btn-chat" class="btn-common chat">
                     <img src="icons/chat-icon.svg" alt="">
                     <div class="count">
                         9+
@@ -338,11 +335,13 @@
     </section>
 
     <script>
-        const btn = document.getElementById("test");
         const btnEmoji = document.querySelector("#emoji");
         const btnCaption = document.querySelector("#caption");
         const caption = document.querySelector(".caption-section");
         const emoji = document.querySelector(".emoji-section");
+        const btnChat = document.querySelector("#btn-chat");
+        const btnUser = document.querySelector("#btn-user");
+        const infoPanel = document.querySelector(".info-panel");
 
 
         btnEmoji.addEventListener("click", () => {
@@ -353,15 +352,14 @@
             caption.classList.toggle("show-caption");
         })
 
-        btn.addEventListener("click", () => {
-            document.querySelector(".info-panel").classList.toggle("show");
-            document.querySelector(".video-main").classList.toggle("present");
-            document.querySelector(".video-panel").classList.toggle("present");
-            document.querySelectorAll(".video-container").forEach(v => {
-                v.classList.toggle("present")
-            });
-
+        btnUser.addEventListener("click", () => {
+            infoPanel.classList.toggle("show");
         })
+
+        btnChat.addEventListener("click", () => {
+            infoPanel.classList.toggle("show");
+        })
+
     </script>
 </body>
 

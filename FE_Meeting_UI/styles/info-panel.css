@@ -4,7 +4,7 @@
     height: 100%;
     width: 100%;
     border-radius: 12px;
-    transition: flex 1s;
+    transition: flex 0.5s;
     overflow: hidden;
 }
 
