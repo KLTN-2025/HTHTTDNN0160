@@ -222,8 +222,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="toggle-device">
-                    <button class="device-btn">
+                <div id="toogle-mic" class="toggle-device">
+                    <button id="btn-mic" class="device-btn">
                         <img src="icons/mic-slash-icon.svg" alt="">
                         <div class="tooltip">Turn On Camera</div>
                     </button>
@@ -342,6 +342,8 @@
         const btnChat = document.querySelector("#btn-chat");
         const btnUser = document.querySelector("#btn-user");
         const infoPanel = document.querySelector(".info-panel");
+        const btnMic = document.querySelector("#btn-mic");
+        const toogleMic = document.querySelector("#toogle-mic");
 
 
         btnEmoji.addEventListener("click", () => {
@@ -358,6 +360,10 @@
 
         btnChat.addEventListener("click", () => {
             infoPanel.classList.toggle("show");
+        })
+
+        btnMic.addEventListener("click", () => {
+            toogleMic.classList.toggle("on");
         })
 
     </script>

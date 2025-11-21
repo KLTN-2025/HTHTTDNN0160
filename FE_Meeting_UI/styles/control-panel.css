@@ -182,6 +182,8 @@ button {
 .device-control-section .toggle-device .device-btn {
     width: 45px;
     border-radius: 50%;
+    transition: transform 0.5s;
+    z-index: 124;
 }
 
 .device-control-section .toggle-device .option-device-btn {
@@ -189,6 +191,8 @@ button {
     height: 25px;
     border-radius: 50%;
     background-color: transparent;
+    transition: transform 0.7s;
+    z-index: 123;
 }
 
 .device-control-section .toggle-device.on .option-device-btn {
