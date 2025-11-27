@@ -1,6 +1,6 @@
 import Participant from "./Participant.js";
 
-import { getRouterRtpCapabilities, pipeRouters } from "../media/handlers/router.handler.js";
+import { getRouterRtpCapabilities, pipeToRouter } from "../media/handlers/router.handler.js";
 
 export default class Meeting {
     routers = new Map();
@@ -25,19 +25,14 @@ export default class Meeting {
     addParticipant(socketId, routerId) {
         this.participants.set(socketId, new Participant(routerId));
     }
+    // this.pipes.set(`${socketId}-${producerId}-${routerSend}-${routerId}`, pipeRouter);
 
-    async pipeRouter(producerId, routerSend, socketId) {
+    async pipeRouter({ routerSendId, routerReceiveId, producerId }) {
+        const routerA = this.getRouter(routerSendId).router;
+        const routerB = this.getRouter(routerReceiveId).router;
+        const pipe = await pipeToRouter(routerA, routerB, producerId);
 
-        const routerA = this.routers.get(routerSend).router;
-        
-        for (const [routerId, router] of this.routers) {
-            if (routerId !== routerSend) {
-                const pipeRouter = await pipeRouters(routerA, router.router, producerId);
-                console.log(pipeRouter, "✅ Piped successfully");
-
-                this.pipes.set(`${socketId}-${producerId}-${routerSend}-${routerId}`, pipeRouter);
-            }
-        }
+        return pipe;
     }
 
     // 1. Get info from router -> client: load device
@@ -54,6 +49,7 @@ export default class Meeting {
     // 2. create 2 transports: producer, consumer
     async createWebRtcTransport(socketId) {
         const participant = this.participants.get(socketId);
+
         const router = this.routers.get(participant.routerId);
         const params = await participant.createWebRtcTransport(router.router);
 
@@ -63,48 +59,57 @@ export default class Meeting {
     // 3. produce, consume will run connect first
     async connectTransport(socketId, transportId, dtlsParameters) {
         const participant = this.participants.get(socketId);
+
         const isConnect = await participant.connectTransport({ transportId, dtlsParameters });
+
         return isConnect;
     }
 
     // 4. provide track video, audio, video screensharing
-    async createProducer({ socketId, producerTransportId, rtpParameters, kind }) {
-
+    async createProducer({ socketId, producerTransportId, rtpParameters, kind, appData }) {
         const participant = this.participants.get(socketId);
 
-        const { producerId } = await participant.createProducer({ producerTransportId, rtpParameters, kind });
-
-        await this.pipeRouter(producerId, participant.routerId, socketId);
+        const { producerId } = await participant.createProducer({
+            producerTransportId,
+            rtpParameters,
+            kind,
+            appData
+        });
 
         return { producerId };
     }
 
     // 5. receive track video, audio, video screensharing
-    async createConsumer(producerId, rtpCapabilities, consumerTransportId, kind, socketId, youId) {
-        const participant = this.participants.get(youId);
-        console.log(participant, "herre", youId);
+    async createConsumer({ producerId, rtpCapabilities, consumerTransportId, kind, socketId, anotherId, appData }) {
+        const participant = this.participants.get(socketId);
+        const participantProducer = this.participants.get(anotherId);
+        const routerSendId = participantProducer.routerId;
+        const routerReceiveId = participant.routerId;
 
-        const participantProducer = this.participants.get(socketId);
-
-        if (this.participants.has(socketId)) {
-            if (participant.routerId !== participantProducer.routerId) {
-                const virtualProducer = this.pipes.get(`${socketId}-${producerId}-${participantProducer.routerId}-${participant.routerId}`);
-
-                const virtualProducerId = virtualProducer.pipeProducer.id;
-
-                producerId = virtualProducerId
+        if (routerSendId !== routerReceiveId) {
+            const pipe = this.pipes.get(`${anotherId}-${producerId}-${routerSendId}-${routerReceiveId}`);
+            if (!pipe) {
+                const pipe = await this.pipeRouter({ routerSendId, routerReceiveId, producerId });
+                this.pipes.set(`${anotherId}-${producerId}-${routerSendId}-${routerReceiveId}`, pipe);
+                producerId = pipe.pipeProducer.id;
+            } else {
+                producerId = pipe.pipeProducer.id;
             }
         }
 
-        
-
-        const { params } = await participant.createConsumer({ consumerTransportId, rtpCapabilities, producerId, kind });
+        const { params } = await participant.createConsumer({
+            consumerTransportId,
+            rtpCapabilities,
+            producerId,
+            kind,
+            appData
+        });
 
         return params;
     }
 
     // 6. when receive track video -> have to paused -> therefore, must resume consume
-    async resumeConsumer(socketId, consumerId) {
+    async resumeConsumer({ socketId, consumerId }) {
         const participant = this.participants.get(socketId);
         await participant.resumeConsumer({ consumerId });
     }

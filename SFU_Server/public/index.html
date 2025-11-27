@@ -35,7 +35,14 @@
     <div id="videos"></div>
 
     <script>
-        const socket = io();
+        const socket = null;
+        try {
+            socket = io("http://127.0.0.1:3000");
+            console.log("kết nối socket thành công", socket);
+        } catch (error) {
+            
+        }
+        
         const videos = document.getElementById("videos");
 
         let device, producerTransport, consumerTransport;

@@ -6,7 +6,7 @@ export default class Participant {
     transports = new Map();
     producers = new Map();
     consumers = new Map();
-    
+
     constructor(routerId) {
         this.routerId = routerId;
     }
@@ -61,10 +61,15 @@ export default class Participant {
         return isConnect;
     }
 
-    async createProducer({producerTransportId, rtpParameters, kind}) {
+    async createProducer({ producerTransportId, rtpParameters, kind, appData }) {
         const transport = this.transports.get(producerTransportId);
-        
-        const producer = await createProducer({ transport, rtpParameters, kind });
+
+        const producer = await createProducer({
+            transport,
+            rtpParameters,
+            kind,
+            appData
+        });
 
         this.producers.set(producer.id, producer);
 
@@ -82,13 +87,19 @@ export default class Participant {
         return { producerId: producer.id, routerId: this.routerId };
     }
 
-    async createConsumer({ consumerTransportId, rtpCapabilities, producerId, kind }) {
+    async createConsumer({ consumerTransportId, rtpCapabilities, producerId, kind, appData }) {
         const transport = this.transports.get(consumerTransportId);
         const isVideo = kind === "video";
-        
+
         let consumer = null;
         try {
-            consumer = await createConsumer({ rtpCapabilities, producerId, isVideo, transport });
+            consumer = await createConsumer({
+                rtpCapabilities,
+                producerId,
+                isVideo,
+                transport,
+                appData
+            });
             this.consumers.set(consumer.id, consumer);
         } catch (error) {
             return false;
@@ -97,7 +108,7 @@ export default class Participant {
         if (consumer.kind === 'video' && consumer.type === "simulcast") {
             const spatialLayer = 0;
             const temporalLayer = 0;
-            const isSetPrefferred =  await setPreferredLayers({ consumer, spatialLayer, temporalLayer });
+            const isSetPrefferred = await setPreferredLayers({ consumer, spatialLayer, temporalLayer });
             console.log(consumer);
         }
 
@@ -125,13 +136,13 @@ export default class Participant {
                 kind: consumer.kind,
                 rtpParameters: consumer.rtpParameters,
                 type: consumer.type,
+                appData
             }
         }
     }
 
     async resumeConsumer({ consumerId }) {
         const consumer = this.consumers.get(consumerId);
-
         await consumer.resume();
     }
 

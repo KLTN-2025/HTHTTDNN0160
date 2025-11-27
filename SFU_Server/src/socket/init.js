@@ -5,7 +5,7 @@ import {
     connectTransport,
     produce,
     consume,
-    resume
+    resume,
 } from "./handlers/mediasoup.js";
 
 export const initSocketEvents = (io) => {
@@ -37,47 +37,49 @@ export const initSocketEvents = (io) => {
             callback(isConnected);
         });
 
-        socket.on("produce", async ({ producerTransportId, rtpParameters, kind }, callback) => {
-            const { producerId } = await produce(
+        socket.on("produce", async ({ producerTransportId, rtpParameters, kind, appData }, callback) => {
+
+            const { producerId } = await produce({
                 producerTransportId,
                 rtpParameters,
                 kind,
-                socket.meetingId,
-                socket.id
-            );
+                meetingId: socket.meetingId,
+                socketId: socket.id,
+                appData
+            });
 
             socket.to(socket.meetingId).emit("newProducer", {
                 socketId: socket.id,
                 producerId,
                 kind,
+                appData
             });
 
             callback({ producerId });
         });
 
-        socket.on(
-            "consume",
-            async (
-                { producerId, rtpCapabilities, consumerTransportId, kind, socketId },
-                callback
-            ) => {
-                const params = await consume(
-                    producerId,
-                    rtpCapabilities,
-                    consumerTransportId,
-                    kind,
-                    socketId,
-                    socket.id,
-                    socket.meetingId
-                );
-                callback(params);
-            }
-        );
+        socket.on("consume", async ({ producerId, rtpCapabilities, consumerTransportId, kind, socketId, appData }, callback) => {
+            
+            const params = await consume({
+                producerId,
+                rtpCapabilities,
+                consumerTransportId,
+                kind,
+                anotherId: socketId,
+                socketId: socket.id,
+                meetingId: socket.meetingId,
+                appData
+            });
 
-        socket.on("resume", async ({ consumerId }, callback) => {
+            callback(params);
+        });
 
-            await resume(socket.id, socket.meetingId, consumerId);
-
+        socket.on("resume", async ({ consumerId }) => {
+            await resume({
+                socketId: socket.id, 
+                meetingId: socket.meetingId, 
+                consumerId
+            });
         });
 
         socket.on("disconnect", () => {
@@ -94,5 +96,8 @@ export const initSocketEvents = (io) => {
                 meetings.delete(socket.meetingId);
             }
         });
+
+
+
     });
 };

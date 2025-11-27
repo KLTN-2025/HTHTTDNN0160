@@ -24,17 +24,18 @@ export const connectTransport = async (transport, dtlsParameters) => {
     return true;
 };
 
-export const createProducer = async ({ transport, rtpParameters, kind }) => {
-    const producer = await transport.produce({ rtpParameters, kind });
+export const createProducer = async ({ transport, rtpParameters, kind, appData }) => {
+    const producer = await transport.produce({ rtpParameters, kind, appData });
 
     return producer;
 };
 
-export const createConsumer = async ({ transport, producerId, rtpCapabilities, isVideo }) => {
+export const createConsumer = async ({ transport, producerId, rtpCapabilities, isVideo, appData }) => {
     const consumer = await transport.consume({
         producerId: producerId,
         rtpCapabilities,
-        paused: isVideo
+        paused: isVideo,
+        appData
     });
 
     return consumer;

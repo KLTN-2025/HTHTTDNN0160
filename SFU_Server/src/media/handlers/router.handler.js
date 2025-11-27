@@ -1,7 +1,6 @@
 import { mediasoup as mediasoupConfig } from "../mediasoup.config.js";
 
 
-
 export const createRouter = async (worker) => {
     const router = {
         workerId: worker.pid,
@@ -16,7 +15,7 @@ export const getRouterRtpCapabilities = async (router) => {
     return router.rtpCapabilities;
 };
 
-export const pipeRouters = async (routerA, routerB, producerId) => {
+export const pipeToRouter = async (routerA, routerB, producerId) => {
     try {
         const pipe = await routerA.pipeToRouter({
             producerId,
