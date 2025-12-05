@@ -12,12 +12,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "async-mutex": "^0.5.0",
     "cors": "^2.8.5",
     "esbuild": "^0.25.11",
     "express": "^5.1.0",
     "httpolyglot": "^0.1.2",
     "mediasoup": "^3.19.4",
-    "mediasoup-client": "^3.16.7",
+    "mediasoup-client": "^3.18.1",
     "pidusage": "^4.0.1",
     "socket.io": "^4.8.1"
   },

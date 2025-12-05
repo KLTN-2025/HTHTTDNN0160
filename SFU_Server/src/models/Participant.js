@@ -31,7 +31,7 @@ export default class Participant {
             if (state === 'failed' || state === 'closed') {
                 transport.close();
             }
-        });
+        });                   
 
         transport.on('iceselectedtuplechange', (tuple) => {
             // console.log(`[ICE SELECTED] ${transport.id}`, tuple);
@@ -45,12 +45,10 @@ export default class Participant {
         this.transports.set(transport.id, transport);
 
         return {
-            params: {
-                id: transport.id,
-                iceParameters: transport.iceParameters,
-                iceCandidates: transport.iceCandidates,
-                dtlsParameters: transport.dtlsParameters
-            }
+            id: transport.id,
+            iceParameters: transport.iceParameters,
+            iceCandidates: transport.iceCandidates,
+            dtlsParameters: transport.dtlsParameters
         }
     }
 
@@ -61,8 +59,11 @@ export default class Participant {
         return isConnect;
     }
 
-    async createProducer({ producerTransportId, rtpParameters, kind, appData }) {
-        const transport = this.transports.get(producerTransportId);
+    /**
+ * @param {{ socket: import("socket.io").Socket }} options
+ */
+    async createProducer({ transportId, rtpParameters, kind, appData, socket }) {
+        const transport = this.transports.get(transportId);
 
         const producer = await createProducer({
             transport,
@@ -70,6 +71,7 @@ export default class Participant {
             kind,
             appData
         });
+
 
         this.producers.set(producer.id, producer);
 
@@ -81,18 +83,49 @@ export default class Participant {
         )
 
         producer.on('close', () => {
-            console.log(`Producer ${producer.id} closed`);
+            this.producers.delete(producer.id);
+            socket.emit("this-participant-close-producer", { producerId: producer.id })
         });
 
-        return { producerId: producer.id, routerId: this.routerId };
+
+        return producer.id;
     }
 
-    async createConsumer({ consumerTransportId, rtpCapabilities, producerId, kind, appData }) {
-        const transport = this.transports.get(consumerTransportId);
+    /**
+     * @typedef {import('mediasoup').types.Producer} CustomProducer
+    */
+    /**
+     * @param {{ producerId: string }} param0
+    */
+    async closeProducer({ producerId }) {
+        const producer = /** @type {CustomProducer} */ (
+            this.producers.get(producerId)
+        );
+
+        if (!producer) {
+            return {
+                isSuccess: false,
+                type: "not found"
+            };
+        }
+
+        if (!producer.closed) {
+            await producer.close();
+        }
+
+        return {
+            isSuccess: true,
+            type: producer.appData
+        };
+    }
+
+    async createConsumer({ transportId, rtpCapabilities, producerId, kind, appData, socket, socketId, anotherId }) {
+        const transport = this.transports.get(transportId);
         const isVideo = kind === "video";
 
         let consumer = null;
         try {
+
             consumer = await createConsumer({
                 rtpCapabilities,
                 producerId,
@@ -100,16 +133,16 @@ export default class Participant {
                 transport,
                 appData
             });
+
             this.consumers.set(consumer.id, consumer);
         } catch (error) {
-            return false;
+            console.log(error);
         }
 
         if (consumer.kind === 'video' && consumer.type === "simulcast") {
             const spatialLayer = 0;
             const temporalLayer = 0;
             const isSetPrefferred = await setPreferredLayers({ consumer, spatialLayer, temporalLayer });
-            console.log(consumer);
         }
 
         consumer.on('transportclose', () => {
@@ -121,23 +154,27 @@ export default class Participant {
         });
 
         consumer.on('producerclose', () => {
+
             if (!consumer.closed) {
                 console.log('Producer closed');
                 consumer.close();
             }
+
             this.consumers.delete(consumer.id);
+
+            if (socket) {
+                socket.emit("producer-closed", { producerId, anotherId, appData });
+            }
+
         });
 
-
         return {
-            params: {
-                producerId: producerId,
-                id: consumer.id,
-                kind: consumer.kind,
-                rtpParameters: consumer.rtpParameters,
-                type: consumer.type,
-                appData
-            }
+            producerId: producerId,
+            id: consumer.id,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters,
+            type: consumer.type,
+            appData
         }
     }
 

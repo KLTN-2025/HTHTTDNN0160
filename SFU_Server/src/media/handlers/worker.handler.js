@@ -3,10 +3,16 @@ import mediasoup from "mediasoup";
 
 export const workers = [];
 
-const MAX_USERS_WORKER = 1;
-
+const MAX_USERS_WORKER = 2;
+/**
+ * @typedef {import('mediasoup').types.Worker & {
+ *   nums: number
+ * }} CustomWorker
+ */
 export const createWorkers = async () => {
     for (let i = 0; i < mediasoupConfig.mediasoup.numberWorkers; i++) {
+
+        /** @type {CustomWorker} */
         let worker = await mediasoup.createWorker(mediasoupConfig.mediasoup.worker);
 
         worker.on("died", () => {
@@ -14,27 +20,34 @@ export const createWorkers = async () => {
             setTimeout(() => process.exit(1), 2000);
         });
 
-        workers.push({
-            worker: worker,
-            numUsers: 0,
-        });
+        worker.nums = 0;
+
+        workers.push(worker);
     }
 }
 
+/** 
+ * @returns {CustomWorker | undefined} 
+ */
 export const getWorker = (workerId) => {
-    return workers.find(worker => worker.worker.pid === workerId);
+    return workers.find(worker => worker.pid === workerId);
 }
-
-export const findWorkerFeasible = async () => {
+/** 
+ * @returns {CustomWorker | undefined} 
+ */
+export const findWorkerFeasible = () => {
     const leastLoaded = workers.reduce((min, curr) => {
-        return curr.numUsers < min.numUsers ? curr : min;
+        return curr.nums < min.nums ? curr : min;
     });
     return leastLoaded;
 };
 
+/** @returns {CustomWorker | undefined} */
 export const checkWorkerCurrentUsaged = (workerId) => {
-    const worker = workers.find(worker => worker.worker.pid === workerId);
-    if (worker.numUsers >= MAX_USERS_WORKER) {
+    const worker = workers.find(worker => worker.pid === workerId);
+    if (worker.nums >= MAX_USERS_WORKER) {
         return false;
-    } 
+    }
+
+    return true;
 }

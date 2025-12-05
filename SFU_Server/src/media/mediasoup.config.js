@@ -18,7 +18,7 @@ const getLocalIp = () => {
     return localIp;
 };
 
-export const mediasoup  = {
+export const mediasoup = {
     listenIp: "0.0.0.0",
     listenPort: 3000,
     sslCrt: "",
