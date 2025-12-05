@@ -1,0 +1,9 @@
+.main-meeting .caption-section {
+  overflow: hidden;
+  height: 0;
+  transition: height 0.3s ease;
+}
+
+.main-meeting .caption-section.show-caption {
+  height: 150px;
+}

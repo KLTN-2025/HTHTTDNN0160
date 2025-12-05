@@ -1,0 +1,431 @@
+.main-meeting .control-panel {
+    height: 80px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.main-meeting .control-panel button {
+    position: relative;
+}
+
+.main-meeting .info-control-section {
+    flex: 1;
+    margin-left: 12px;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.main-meeting .info-control-section img {
+    height: 12px;
+    filter: brightness(0) invert(1);
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.main-meeting .device-control-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+    flex: 2;
+    position: relative;
+}
+
+.main-meeting .device-control-section .box-option {
+    position: absolute;
+    width: 60%;
+    height: 60px;
+    bottom: 70px;
+    background-color: #2c2c2e;
+    border-radius: 30px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding-left: 15px;
+    padding-right: 15px;
+    display: none;
+}
+
+.main-meeting .device-control-section .box-option.show {
+    display: flex;
+}
+
+.main-meeting .device-control-section .box-option .box-option-item {
+    font-family: "Google Sans Flex", Roboto, Arial, sans-serif;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 12px;
+    background: #2c2c2e;
+    color: white;
+    border-radius: 20px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.main-meeting .device-control-section .box-option .box-option-item:hover {
+    border: 1px solid rgba(255, 255, 255, 0.479);
+    background: #5b5b5f;
+}
+
+.main-meeting .device-control-section .box-option .box-option-item img {
+    flex: 1;
+    height: 15px;
+}
+
+.main-meeting .device-control-section .box-option .box-option-item span {
+    flex: 8;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.main-meeting .device-control-section .box-option .btn-setting {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    padding: 0;
+    background-color: #2c2c2e;
+}
+
+.main-meeting .device-control-section .box-option .btn-setting:hover {
+    background-color: #3f3f42;
+}
+
+.main-meeting .device-control-section .box-option .btn-setting img {
+    height: 30px;
+}
+
+.main-meeting .device-control-section .box-option .list-option {
+    position: absolute;
+    bottom: 45px;
+    left: 0;
+    right: 0;
+    height: max-content;
+    background-color: #2c2c2e;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: none;
+}
+
+.main-meeting .device-control-section .box-option .list-option.show {
+    display: block;
+}
+
+.main-meeting .device-control-section .box-option .list-option .item {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    color: rgba(255, 255, 255, 0.795);
+    cursor: pointer;
+    padding-left: 15px;
+    padding-right: 15px;
+    align-items: center;
+    gap: 20px;
+}
+
+.main-meeting .device-control-section .box-option .list-option .item:hover {
+    background-color: #636368;
+}
+
+.main-meeting .device-control-section .box-option .list-option .item .icon-tick {
+    width: 20px;
+}
+
+.main-meeting .device-control-section .box-option .list-option .item .icon-tick img {
+    width: 100%;
+}
+
+
+.main-meeting .device-control-section button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 45px;
+    border: none;
+    background-color: #414345;
+}
+
+.main-meeting .device-control-section button:hover {
+    background-color: #575a5e;
+}
+
+.main-meeting .device-control-section img {
+    height: 20px;
+    filter: brightness(1) invert(1);
+}
+
+.main-meeting .device-control-section .toggle-device {
+    width: 85px;
+    background-color: rgba(255, 141, 141, 0.267);
+    height: 45px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.main-meeting .device-control-section .toggle-device.cam .device-btn img {
+    height: 26px;
+}
+
+.main-meeting .device-control-section .toggle-device.on {
+    background-color: #2e3031;
+}
+
+.main-meeting .device-control-section .toggle-device.on .device-btn {
+    transform: translateX(87%);
+    background-color: #a8c7fa;
+}
+
+.main-meeting .device-control-section .toggle-device.on .device-btn:hover {
+    background-color: #87a1ca;
+}
+
+.main-meeting .device-control-section .toggle-device .device-btn {
+    width: 45px;
+    border-radius: 50%;
+    transition: transform 0.5s;
+    z-index: 124;
+}
+
+.main-meeting .device-control-section .toggle-device .option-device-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: transform 0.7s;
+    z-index: 123;
+}
+
+.main-meeting .device-control-section .toggle-device.on .option-device-btn {
+    transform: translateX(-200%);
+}
+
+.main-meeting .device-control-section .toggle-device.on .option-device-btn:hover {
+    background-color: #575a5e;
+}
+
+.main-meeting .device-control-section .toggle-device .option-device-btn:hover {
+    background-color: rgba(255, 141, 141, 0.267);
+}
+
+.main-meeting .device-control-section .btn-common {
+    width: 45px;
+    border-radius: 25px;
+}
+
+.main-meeting .device-control-section .btn-common.slide-show img {
+    filter: brightness(0) invert(1);
+    margin-left: 1px;
+}
+
+.main-meeting .device-control-section .btn-common.emoji img {
+    width: 29px;
+    height: 29px;
+    margin-bottom: 4px;
+    margin-left: 0.5px;
+}
+
+.main-meeting .device-control-section .btn-common.hand-up img {
+    width: 25.5px;
+    height: 25.5px;
+}
+
+.main-meeting .device-control-section .feature-more {
+    position: relative;
+}
+
+.main-meeting .device-control-section .feature-more .btn-more {
+    padding: 0;
+    border-radius: 15px;
+}
+
+.main-meeting .device-control-section .feature-more .btn-more img {
+    height: 28px;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option {
+    position: absolute;
+    left: 0px;
+    bottom: 130%;
+    height: max-content;
+    width: 300px;
+    background-color: #242425;
+    border-radius: 8px;
+    display: none;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .title {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.795);
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .feature {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    color: rgba(255, 255, 255, 0.795);
+    cursor: pointer;
+    padding-left: 15px;
+    align-items: center;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .feature img {
+    margin-right: 16px;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .feature:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .feature:hover {
+    background-color: #636368;
+}
+
+.main-meeting .device-control-section .feature-more .feature-option .separater {
+    width: 100%;
+    border-bottom: 2px gray solid;
+}
+
+.main-meeting .device-control-section .option-cancel {
+    display: flex;
+    width: 85px;
+}
+
+.main-meeting .device-control-section .option-cancel .btn-cancel {
+    width: 100%;
+    background-color: #ea4335;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-meeting .device-control-section .option-cancel .btn-cancel:hover {
+    background-color: #ec5a4d;
+}
+
+.main-meeting .device-control-section .option-cancel.has-option .btn-cancel {
+    width: 65%;
+    border-radius: 8px 0 0 8px;
+}
+
+.main-meeting .device-control-section .option-cancel.has-option .btn-cancel img {
+    height: 30px;
+}
+
+.main-meeting .device-control-section .option-cancel .btn-cancel img {
+    height: 35px;
+}
+
+.main-meeting .device-control-section .option-cancel.has-option .btn-cancel-option {
+    width: 35%;
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-meeting .device-control-section .option-cancel .btn-cancel-option {
+    display: none;
+}
+
+.main-meeting .user-control-section {
+    margin-right: 12px;
+    color: white;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+    height: 100%;
+}
+
+.main-meeting .user-control-section button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 45px;
+    border: none;
+    background-color: #414345;
+}
+
+.main-meeting .user-control-section button:hover {
+    background-color: #575a5e;
+}
+
+.main-meeting .user-control-section img {
+    height: 20px;
+    filter: brightness(0) invert(1);
+}
+
+.main-meeting .user-control-section .btn-common {
+    width: 45px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.main-meeting .user-control-section .btn-common .count {
+    position: absolute;
+    left: 60%;
+    bottom: 75%;
+    background-color: red;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-meeting .user-control-section .btn-common.chat img {
+    height: 26px;
+}
+
+.main-meeting .user-control-section .btn-common.user img {
+    height: 24px;
+}
+
+.main-meeting .tooltip {
+    background: rgba(32, 33, 36, 0.9);
+    color: white;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    position: absolute;
+    white-space: nowrap;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    bottom: 50px;
+    font-family: "Google Sans Flex", Roboto, Arial, sans-serif;
+}
+
+.main-meeting .tooltip.close-edge-right {
+    transform: translateX(-25%);
+}
+
+.main-meeting .control-panel button:hover .tooltip {
+    opacity: 1;
+}

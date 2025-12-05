@@ -1,0 +1,22 @@
+.main-meeting .content-panel {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 12px 0 12px;
+    display: flex;
+    min-height: 0;
+}
+
+.main-meeting .video-main {
+    flex: 0;
+    transition: flex 0.8s;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 12px;
+    transition: flex 0.8s;
+}
+
+.main-meeting .video-main.present {
+    flex: 7;
+    padding: 12px;
+}

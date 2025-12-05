@@ -1,0 +1,14 @@
+.main-meeting .info-panel {
+    flex: 0;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    transition: flex 0.5s;
+    overflow: hidden;
+}
+
+.main-meeting .info-panel.show {
+    flex: 2;
+    margin-left: 12px;
+}

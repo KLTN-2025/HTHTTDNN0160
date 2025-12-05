@@ -1,8 +1,7 @@
 <script setup>
 
-
 </script>
 
 <template>
-  <router-view></router-view>
+    <span>Time Start: 12:00 AM</span>
 </template>

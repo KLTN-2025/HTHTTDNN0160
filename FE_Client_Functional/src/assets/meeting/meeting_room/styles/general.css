@@ -1,0 +1,41 @@
+@import "./content-panel.css";
+@import "./control-panel.css";
+@import "./video-panel.css";
+@import "./info-panel.css";
+@import "./emoji-section.css";
+@import "./caption-section.css";
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+body {
+    font-family: "Google Sans Flex", Roboto, Arial, sans-serif;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #131314;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
+}
+
+img {
+    display: block;
+}
+
+.main-meeting {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    height: 100%;
+}
+
+
