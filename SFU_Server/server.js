@@ -47,7 +47,6 @@ async function run() {
 
 // run();
 
-console.log(process.env.GEMINI_API_KEY);
 
 export const geminiModelTranslator = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
