@@ -1,5 +1,5 @@
 
-export const getStreamDevice = async ({ type }) => {
+export const getStreamDevice = async ({ type, deviceId }) => {
     return new Promise(async (resolve) => {
 
         let isHandled = false;
@@ -15,26 +15,19 @@ export const getStreamDevice = async ({ type }) => {
         try {
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: type === "camera",
+                video: type === "camera" ? {
+                    deviceId: deviceId
+                        ? { exact: deviceId }
+                        : undefined
+                } : false,
                 audio: type === "micro"
                     ? {
-                        echoCancellation: true,
-                        noiseSuppression: false,
-                        autoGainControl: false
+                        deviceId: deviceId
+                            ? { exact: deviceId }
+                            : undefined,
                     }
                     : false
             });
-
-            // Nếu là MIC thì TĂNG GAIN
-            if (type === "micro") {
-                const boostedStream = boostMicroStream(stream);  // <<< TĂNG GAIN tại đây
-
-                if (!isHandled) {
-                    isHandled = true;
-                    resolve(boostedStream);
-                }
-                return;
-            }
 
             // Nếu camera thì trả về bình thường
             if (!isHandled) {
@@ -61,22 +54,10 @@ export const getStreamMedia = async () => {
     return stream;
 }
 
-function boostMicroStream(originalStream) {
-    const audioContext = new AudioContext();
 
-    // track gốc
-    const source = audioContext.createMediaStreamSource(originalStream);
-
-    // tạo gain node
-    const gainNode = audioContext.createGain();
-    gainNode.gain.value = 3.5;   // tăng 350% (bạn muốn 5x thì để 5)
-
-    // pipeline: source -> gain -> dest
-    const dest = audioContext.createMediaStreamDestination();
-
-    source.connect(gainNode);
-    gainNode.connect(dest);
-
-    // dest.stream là stream mới đã được boost
-    return dest.stream;
+export const getTimeHM = () => {
+    const now = new Date()
+    const h = now.getHours().toString().padStart(2, '0')
+    const m = now.getMinutes().toString().padStart(2, '0')
+    return `${h}:${m}`
 }

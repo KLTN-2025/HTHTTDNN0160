@@ -46,6 +46,28 @@ export const useMediasoupStore = defineStore("mediasoupstore", () => {
         codecOptions: { videoGoogleStartBitrate: 1000 },
     };
 
+    /**
+ * @typedef {Object} SendTransportState
+ * @property {boolean} isInit
+ * @property {import("mediasoup-client/lib/types").Transport | null} producerTransport
+ * @property {Map<string, import("mediasoup-client/lib/types").Producer>} producers
+ * @property {any} sendParams
+ */
+
+    /**
+     * @typedef {Object} ReceiveTransportState
+     * @property {boolean} isInit
+     * @property {import("mediasoup-client/lib/types").Transport | null} consumerTransport
+     * @property {Map<string, import("mediasoup-client/lib/types").Consumer>} consumers
+     * @property {any} receiveParams
+     */
+
+    /**
+     * @typedef {Object} TransportsState
+     * @property {SendTransportState} sendTransport
+     * @property {ReceiveTransportState} receiveTransport
+     */
+    /** @type {TransportsState} */
     const transports = {
         sendTransport: {
             isInit: false,
@@ -125,7 +147,6 @@ export const useMediasoupStore = defineStore("mediasoupstore", () => {
             encodings,
             appData: { source: type }
         });
-
 
         const producerId = producer.id;
 

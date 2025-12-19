@@ -7,6 +7,6 @@ import IconCaption from '../icons/IconCaption.vue';
 <template>
     <button id="caption" class="btn-common">
         <IconCaption></IconCaption>
-        <div class="tooltip">Turn On Camera</div>
+        <Tooltip>Caption</Tooltip>
     </button>
 </template>

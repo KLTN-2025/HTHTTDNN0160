@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useSocketStore } from "./useSocketStore";
 import { useMediasoupStore } from "./useMediasoupStore";
-import { getStreamDevice, getStreamMedia } from "@/utils/meeting";
+import { getStreamDevice, getStreamMedia, getTimeHM } from "@/utils/meeting";
 
 export const useMeetingStore = defineStore("meetingstore", () => {
 
@@ -10,8 +10,76 @@ export const useMeetingStore = defineStore("meetingstore", () => {
         id: 1,
         name: "Phuc",
         micro: false,
-        camera: true
+        camera: true,
+        speaker: "",
+        cam: "",
+        mic: "",
+        lang: navigator.language || 'en-US',
     });
+
+    watch(
+        () => user.value.lang,
+        (newValue, oldValue) => {
+            console.log(newValue, oldValue);
+            socketStore.switchLang(newValue, oldValue);
+        }
+    );
+
+    const LANGS = ref([
+        { code: "vi-VN", label: "🇻🇳 Tiếng Việt" },
+        { code: "en-US", label: "🇺🇸 English (US)" },
+        { code: "en-GB", label: "🇬🇧 English (UK)" },
+        { code: "fr-FR", label: "🇫🇷 Français" },
+        { code: "de-DE", label: "🇩🇪 Deutsch" },
+        { code: "es-ES", label: "🇪🇸 Español" },
+        { code: "pt-PT", label: "🇵🇹 Português (Portugal)" },
+        { code: "pt-BR", label: "🇧🇷 Português (Brasil)" },
+        { code: "it-IT", label: "🇮🇹 Italiano" },
+        { code: "nl-NL", label: "🇳🇱 Nederlands" },
+
+        { code: "ru-RU", label: "🇷🇺 Русский" },
+        { code: "uk-UA", label: "🇺🇦 Українська" },
+        { code: "pl-PL", label: "🇵🇱 Polski" },
+        { code: "cs-CZ", label: "🇨🇿 Čeština" },
+        { code: "ro-RO", label: "🇷🇴 Română" },
+        { code: "hu-HU", label: "🇭🇺 Magyar" },
+        { code: "sv-SE", label: "🇸🇪 Svenska" },
+        { code: "no-NO", label: "🇳🇴 Norsk" },
+        { code: "da-DK", label: "🇩🇰 Dansk" },
+        { code: "fi-FI", label: "🇫🇮 Suomi" },
+
+        { code: "ja-JP", label: "🇯🇵 日本語" },
+        { code: "ko-KR", label: "🇰🇷 한국어" },
+        { code: "zh-CN", label: "🇨🇳 中文 (简体)" },
+        { code: "zh-TW", label: "🇹🇼 中文 (繁體)" },
+        { code: "th-TH", label: "🇹🇭 ไทย" },
+        { code: "id-ID", label: "🇮🇩 Bahasa Indonesia" },
+        { code: "ms-MY", label: "🇲🇾 Bahasa Melayu" },
+
+        { code: "ar-SA", label: "🇸🇦 العربية" },
+        { code: "he-IL", label: "🇮🇱 עברית" },
+        { code: "tr-TR", label: "🇹🇷 Türkçe" },
+        { code: "hi-IN", label: "🇮🇳 हिन्दी" },
+        { code: "bn-BD", label: "🇧🇩 বাংলা" },
+        { code: "ur-PK", label: "🇵🇰 اردو" },
+
+        { code: "fa-IR", label: "🇮🇷 فارسی" },
+        { code: "ta-IN", label: "🇮🇳 தமிழ்" },
+        { code: "te-IN", label: "🇮🇳 తెలుగు" },
+        { code: "kn-IN", label: "🇮🇳 ಕನ್ನಡ" },
+        { code: "ml-IN", label: "🇮🇳 മലയാളം" },
+
+        { code: "sw-KE", label: "🇰🇪 Kiswahili" },
+        { code: "af-ZA", label: "🇿🇦 Afrikaans" },
+        { code: "am-ET", label: "🇪🇹 አማርኛ" },
+    ]);
+
+    const captions = ref([]);
+
+
+    const messages = ref([]);
+
+    const recognition = ref(null);
 
     const emoji = ref([
         { id: 1, emoji: "💖" },
@@ -25,16 +93,8 @@ export const useMeetingStore = defineStore("meetingstore", () => {
         { id: 9, emoji: "👎" },
     ]);
 
-    /**
- * @typedef {Object} ShareScreenData
- * @property {boolean} isSharingScreen
- * @property {string} socketId
- * @property {{ video: string|null, audio: string|null }} producers
- * @property {{ video: string|null, audio: string|null }} consumers
- * @property {{ video: MediaStream|null, audio: MediaStream|null }} streams
- */
+    const enumerateDevices = ref(null);
 
-    /** @type {import('vue').Ref<ShareScreenData>} */
     const dataShareScreen = ref({
         isSharingScreen: false,
         socketId: null,
@@ -51,39 +111,80 @@ export const useMeetingStore = defineStore("meetingstore", () => {
 
     const typeDevice = ref("");
 
-    const showDevice = ({ type }) => {
+    const showDevice = async ({ type }) => {
+        if (!enumerateDevices.value) {
+            enumerateDevices.value = await getDevices();
+            user.value.speaker = enumerateDevices.value.speakers[0];
+            user.value.cam = enumerateDevices.value.cams[0];
+            user.value.mic = enumerateDevices.value.mics[0];
+        }
         typeDevice.value = type;
     }
 
+    const speechToText = () => {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("Trình duyệt không hỗ trợ Web Speech API");
+        }
+
+        recognition.value = new SpeechRecognition();
+
+        recognition.value.lang = user.value.lang;
+        recognition.value.continuous = true;
+        recognition.value.interimResults = true;
+
+        recognition.value.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+
+                if (result.isFinal) {
+                    const caption = result[0].transcript.trim();
+                    socketStore.sendCaption({ caption, sourceLang: user.value.lang });
+                    captions.value.push({
+                        socketId: socket.value.id,
+                        caption
+                    })
+                }
+            }
+        };
+
+        recognition.value.onend = () => {
+            if (user.value.micro) {
+                recognition.value.start();
+            }
+        };
+
+    }
 
     const renderVideo = computed(() => {
-        return users.value.slice().sort((a, b) => {
+        return users.value
+            .filter(u => u.isLive)
+            .slice()
+            .sort((a, b) => {
+                const isMeA = a.socketId === socket.value.id;
+                const isMeB = b.socketId === socket.value.id;
 
-            // Ưu tiên chính mình lên đầu
-            const isMeA = a.socketId === socket.value.id;
-            const isMeB = b.socketId === socket.value.id;
+                if (isMeA && !isMeB) return -1;
+                if (!isMeA && isMeB) return 1;
 
-            if (isMeA && !isMeB) return -1;
-            if (!isMeA && isMeB) return 1;
+                if (a.isSpeaking && !b.isSpeaking) return -1;
+                if (!a.isSpeaking && b.isSpeaking) return 1;
 
-            // Ưu tiên người đang nói
-            if (a.isSpeaking && !b.isSpeaking) return -1;
-            if (!a.isSpeaking && b.isSpeaking) return 1;
+                const nameA = a.name?.toString() || "";
+                const nameB = b.name?.toString() || "";
 
-            const nameA = a.name?.toString() || "";
-            const nameB = b.name?.toString() || "";
+                const startsWithNumberA = /^[0-9]/.test(nameA);
+                const startsWithNumberB = /^[0-9]/.test(nameB);
 
-            // Ưu tiên tên bắt đầu bằng số
-            const startsWithNumberA = /^[0-9]/.test(nameA);
-            const startsWithNumberB = /^[0-9]/.test(nameB);
+                if (startsWithNumberA && !startsWithNumberB) return -1;
+                if (!startsWithNumberA && startsWithNumberB) return 1;
 
-            if (startsWithNumberA && !startsWithNumberB) return -1;
-            if (!startsWithNumberA && startsWithNumberB) return 1;
-
-            // Cuối cùng sắp theo alphabet
-            return nameA.localeCompare(nameB, "en", { sensitivity: "base" });
-        });
+                return nameA.localeCompare(nameB, "en", { sensitivity: "base" });
+            });
     });
+
 
     /**
      * @typedef {Object} Users
@@ -104,6 +205,9 @@ export const useMeetingStore = defineStore("meetingstore", () => {
     const users = ref([]);
 
     const joinMeeting = async () => {
+
+        await speechToText();
+
         const { dataUsers, shareScreen } = await socketStore.joinMeeting({
             meetingId,
             user: { ...user.value, micro: false, camera: false }
@@ -214,7 +318,15 @@ export const useMeetingStore = defineStore("meetingstore", () => {
 
     const turnOnDevice = async ({ type }) => {
 
-        const stream = await getStreamDevice({ type });
+        if (!enumerateDevices.value) {
+            enumerateDevices.value = await getDevices();
+            user.value.speaker = enumerateDevices.value.speakers[0].deviceId;
+            user.value.cam = enumerateDevices.value.cams[0].deviceId;
+            user.value.mic = enumerateDevices.value.mics[0].deviceId;
+        }
+
+        /** @type {MediaStream} */
+        const stream = await getStreamDevice({ type, deviceId: type === "camera" ? user.value.cam : user.value.mic });
 
         if (stream === "reject" || stream === "timeout") {
             if (type === "camera") {
@@ -238,6 +350,7 @@ export const useMeetingStore = defineStore("meetingstore", () => {
                 thisUser.producers.camera = producerId;
                 user.value.camera = true;
             } else {
+                recognition.value.start();
                 thisUser.micro = true;
                 thisUser.streams.micro = null;
                 thisUser.producers.micro = producerId;
@@ -261,6 +374,7 @@ export const useMeetingStore = defineStore("meetingstore", () => {
             thisUser.streams.camera = null;
             user.value.camera = false;
         } else {
+            recognition.value.stop();
             const producer = mediasoupstore.getProducer({ producerId: thisUser.producers.micro });
             producer.track.stop();
             await producer.close();
@@ -275,6 +389,9 @@ export const useMeetingStore = defineStore("meetingstore", () => {
     }
 
     const shareScreen = async () => {
+
+        if (dataShareScreen.value.isSharingScreen) return;
+
         const stream = await getStreamMedia();
 
         dataShareScreen.value.isSharingScreen = true;
@@ -421,10 +538,135 @@ export const useMeetingStore = defineStore("meetingstore", () => {
         user.raiseHand = false;
     }
 
+    const getDevices = async () => {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        const mics = devices.filter(d => d.kind === "audioinput").filter(v => v.deviceId !== 'default' && v.deviceId !== 'communications');
+
+        const cams = devices.filter(d => d.kind === "videoinput").filter(v => v.deviceId !== 'default' && v.deviceId !== 'communications');
+
+        const speakers = devices.filter(d => d.kind === "audiooutput").filter(v => v.deviceId !== 'default' && v.deviceId !== 'communications');
+
+        return { mics, cams, speakers };
+    }
+
+    const switchDevice = async ({ deviceId, type }) => {
+        if (type !== "speaker") {
+            /** @type {MediaStream} */
+            if (type === "camera" && !user.value.camera) {
+                return false;
+            } else if (type === "micro" && !user.value.micro) {
+                return false;
+            }
+
+            if (type === "camera") {
+                const stream = await getStreamDevice({ type, deviceId });
+                const track = await stream.getVideoTracks()[0];
+                const thisUser = users.value.find(v => v.socketId === socket.value.id);
+                if (thisUser) {
+                    const producer = mediasoupstore.transports.sendTransport.producers.get(thisUser.producers.camera);
+                    if (producer) {
+                        if (thisUser.streams.camera) {
+                            await producer.replaceTrack({ track });
+                            await thisUser.streams.camera.getVideoTracks().forEach(t => t.stop());
+                            thisUser.streams.camera = stream;
+                            user.value.cam = deviceId;
+                            return true;
+                        }
+                    }
+                }
+            } else {
+                const thisUser = users.value.find(v => v.socketId === socket.value.id);
+                if (thisUser) {
+                    const producer = mediasoupstore.transports.sendTransport.producers.get(thisUser.producers.micro);
+                    if (producer) {
+                        console.log(thisUser.streams.micro);
+                        await thisUser.streams.micro.getAudioTracks().forEach(t => t.stop());
+                        const stream = await getStreamDevice({ type, deviceId });
+                        const track = await stream.getAudioTracks()[0];
+                        await producer.replaceTrack({ track });
+                        user.value.mic = deviceId;
+                        return true;
+                    }
+                }
+            }
+        } else {
+            const userContainerEle = document.getElementById("user-container");
+            const audioEles = userContainerEle.querySelectorAll("audio");
+
+            for (const audioEl of audioEles) {
+                if (typeof audioEl.setSinkId === "function") {
+                    await audioEl.setSinkId(deviceId);
+                }
+            }
+
+            user.value.speaker = deviceId;
+            return true;
+
+        }
+
+        return false;
+    }
+
+
+    const sendMessage = (message) => {
+        const time = getTimeHM();
+        socketStore.sendMessage(message, time, user.value.lang);
+
+        messages.value.push({
+            socketId: socket.value.id,
+            message,
+            time,
+            translated: message
+        })
+
+    }
+
+    const receiveMessage = ({ message, socketId, time, translated }) => {
+        console.log(translated, "trans");
+
+        messages.value.push({
+            socketId,
+            message,
+            time,
+            translated
+        })
+    }
+
+    const receiveCaption = ({ socketId, caption }) => {
+        captions.value.push({
+            socketId,
+            caption
+        })
+    }
+
+    // const speaking = (speakingProducers) => {
+
+    //     for (const producerId of speakingProducers) {
+    //         const user = users.value.find(v => v.producers.micro === producerId);
+    //         if (user) {
+    //             user.isSpeaking = true;
+    //         }
+    //     }
+
+
+
+
+    // }
+
+    const leaveRoomMessage = ({ socketId }) => {
+        console.log("soc leave", socketId);
+
+        const user = users.value.find(v => v.socketId === socketId);
+        if (user) {
+            user.isLive = false;
+        }
+    }
 
     return {
         user,
         users,
+        enumerateDevices,
         joinMeeting,
         newProducer,
         turnOnDevice,
@@ -437,12 +679,21 @@ export const useMeetingStore = defineStore("meetingstore", () => {
         showDevice,
         typeDevice,
         emoji,
+        messages,
         showEmoji,
         receiveEmoji,
         eraseEmoji,
         raiseHandReceive,
         lowerhand,
         raiseHand,
-        lowerhandReceive
+        lowerhandReceive,
+        switchDevice,
+        sendMessage,
+        receiveMessage,
+        LANGS,
+        receiveCaption,
+        captions,
+        // speaking
+        leaveRoomMessage
     }
 })

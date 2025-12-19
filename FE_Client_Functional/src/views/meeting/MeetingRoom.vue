@@ -12,9 +12,13 @@ import TimeStart from '@/components/meeting/meeting_room/content/TimeStart.vue';
 import Title from '@/components/meeting/meeting_room/content/Title.vue';
 import Audio from "@/components/meeting/meeting_room/common/Audio.vue";
 import EnumerateDevice from "@/components/meeting/meeting_room/common/EnumerateDevice.vue";
+import Chat from "@/components/meeting/meeting_room/content/Chat.vue";
+import User from "@/components/meeting/meeting_room/content/User.vue";
+
 
 // Component: Icon
 import IconVerticalLine from '@/components/meeting/meeting_room/icons/IconVerticalLine.vue';
+import IconXDelete from "@/components/meeting/meeting_room/icons/IconXDelete.vue";
 
 // Component: Button
 import ButtonSlideShow from '@/components/meeting/meeting_room/control/ButtonSlideShow.vue';
@@ -45,7 +49,7 @@ import { useSocketStore } from "@/stores/meeting/useSocketStore";
 /** @type {{ user: User }} */
 
 const meetingStore = useMeetingStore();
-const { users, renderVideo, dataShareScreen, emoji } = storeToRefs(meetingStore);
+const { users, renderVideo, dataShareScreen, emoji, LANGS, user, captions } = storeToRefs(meetingStore);
 const socketStore = useSocketStore();
 const { socket } = storeToRefs(socketStore);
 
@@ -57,9 +61,8 @@ onMounted(async () => {
     await meetingStore.joinMeeting();
 })
 
-
 watch(
-    () => users.value.length,
+    () => renderVideo.value.length,
     async (length) => {
         await nextTick();
         let row = 0;
@@ -74,6 +77,56 @@ watch(
         VideoContainer.value.style.gridTemplateRows = `repeat(${row}, 1fr)`;
     }
 )
+
+const infoPanel = ref(false);
+const isChat = ref(false);
+const isUser = ref(false);
+
+
+function handleUserClick() {
+    if (isChat.value) {
+        infoPanel.value = true
+        isUser.value = true
+        isChat.value = false
+    } else {
+        infoPanel.value = !infoPanel.value
+        isUser.value = infoPanel.value
+    }
+}
+
+function handleChatClick() {
+    if (isUser.value) {
+        infoPanel.value = true
+        isChat.value = true
+        isUser.value = false
+    } else {
+        infoPanel.value = !infoPanel.value
+        isChat.value = infoPanel.value
+    }
+}
+
+function closePanel() {
+    infoPanel.value = false
+    isUser.value = false
+    isChat.value = false
+}
+
+const lastItem = ref(null);
+
+const setLastItem = (el) => {
+    lastItem.value = el;
+};
+
+watch(
+    () => captions.value.length,
+    async () => {
+        await nextTick();
+        lastItem.value?.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+        });
+    }
+);
 
 </script>
 
@@ -92,21 +145,51 @@ watch(
 
             </div>
 
-            <div ref="VideoContainer" class="video-panel" :class="dataShareScreen.isSharingScreen ? 'present' : ''">
-                <Audio v-for="user in users.filter(u => u.socketId !== socket.id)" :key="user.socketId"
-                    :stream="user.streams?.micro">
+            <div ref="VideoContainer" id="user-container" class="video-panel"
+                :class="dataShareScreen.isSharingScreen ? 'present' : ''">
+                <Audio v-for="user in users.filter(u => u.socketId !== socket.id)" v-if="user.isLive"
+                    :key="user.socketId" :stream="user.streams?.micro">
                 </Audio>
                 <Video v-for="user in renderVideo" :key="user.socketId" :user="user"></Video>
             </div>
 
-            <div class="info-panel">
-                <div class="info-content">
-
+            <div class="info-panel" :class="{ 'show': infoPanel }">
+                <div class="content">
+                    <div class="info-header">
+                        <p>{{ isChat ? "Tin nhắn trong cuộc họp" : isUser ? "Danh sách người tham gia" : "" }}</p>
+                        <button @click="closePanel">
+                            <IconXDelete style="height: 25px" />
+                        </button>
+                    </div>
+                    <User v-if="infoPanel && isUser"></User>
+                    <Chat v-if="infoPanel && isChat" />
                 </div>
             </div>
         </div>
 
-        <div class="caption-section"></div>
+        <div class="caption-section">
+            <div class="select-langs">
+                <div class="cs-select" data-value="vi-VN">
+                    <button class="cs-btn" type="button">
+                        <span class="cs-label">{{LANGS.find(v => v.code === user.lang).label}}</span>
+                        <span class="cs-arrow">v</span>
+                    </button>
+
+                    <ul class="cs-list">
+                        <li @click="user.lang = lang.code" v-for="lang in LANGS" class="cs-item"
+                            :class="{ 'active': lang.code === user.lang }">{{ lang.label }}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="caption">
+                <div class="text" v-for="(caption, i) in captions"
+                    :style="{ color: caption.socketId === socket.id ? '#2563EB' : 'white' }"
+                    :key="Date.now() + Math.random()" :ref="i === captions.length - 1 ? setLastItem : null">
+                    {{caption.socketId === socket.id ? 'You' : users.find(v => v.socketId
+                        === caption.socketId).name}}: {{ caption.caption }}
+                </div>
+            </div>
+        </div>
 
 
         <div class="emoji-section">
@@ -150,9 +233,9 @@ watch(
                     <img src="" alt="">
                     <div class="tooltip">Turn On Camera</div>
                 </button>
-                <ButtonUsers></ButtonUsers>
+                <ButtonUsers @turn="handleUserClick" :isUser="isUser"></ButtonUsers>
 
-                <ButtonChat></ButtonChat>
+                <ButtonChat @turn="handleChatClick" :isChat="isChat"></ButtonChat>
 
                 <button class="btn-common">
                     <img src="" alt="">

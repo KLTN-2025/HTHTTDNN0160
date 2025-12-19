@@ -21,7 +21,7 @@ const { user } = storeToRefs(meetingStore);
             <IconCameraSlash v-else></IconCameraSlash>
             <Tooltip>{{ user.camera ? "Turn off camera" : "Turn on camera" }}</Tooltip>
         </button>
-        <button @click="meetingStore.showDevice({ type: 'cam' })" class="option-device-btn">
+        <button @click="meetingStore.showDevice({ type: 'camera' })" class="option-device-btn">
             <IconArrowUp></IconArrowUp>
         </button>   
     </div>

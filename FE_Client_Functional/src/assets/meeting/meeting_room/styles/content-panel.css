@@ -5,6 +5,7 @@
     padding: 12px 12px 0 12px;
     display: flex;
     min-height: 0;
+    overflow: hidden;
 }
 
 .main-meeting .video-main {

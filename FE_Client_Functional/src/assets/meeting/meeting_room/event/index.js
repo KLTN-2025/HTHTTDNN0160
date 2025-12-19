@@ -19,14 +19,6 @@ export const initEvents = () => {
         caption.classList.toggle("show-caption");
     })
 
-    btnUser.addEventListener("click", () => {
-        infoPanel.classList.toggle("show");
-    })
-
-    btnChat.addEventListener("click", () => {
-        infoPanel.classList.toggle("show");
-    })
-
     btnShowDevice.forEach(item => {
         item.addEventListener("click", (e) => {
             optionDevice.classList.toggle("show");
@@ -56,6 +48,39 @@ export const initEvents = () => {
 
     listOption.addEventListener("click", (e) => {
         e.stopPropagation();
+    });
+
+    document.addEventListener("click", (e) => {
+        document.querySelectorAll(".cs-select").forEach(select => {
+            if (!select.contains(e.target)) {
+                select.classList.remove("open");
+            }
+        });
+    });
+
+    document.querySelectorAll(".cs-select").forEach(select => {
+        const btn = select.querySelector(".cs-btn");
+        const label = select.querySelector(".cs-label");
+        const items = select.querySelectorAll(".cs-item");
+
+        btn.onclick = () => {
+            select.classList.toggle("open");
+        };
+
+        items.forEach(item => {
+            item.onclick = () => {
+                items.forEach(i => i.classList.remove("active"));
+                item.classList.add("active");
+
+                label.textContent = item.textContent;
+                select.dataset.value = item.dataset.value;
+
+                select.classList.remove("open");
+
+                // hook chỗ này nếu cần
+                // console.log("selected:", item.dataset.value);
+            };
+        });
     });
 
 }

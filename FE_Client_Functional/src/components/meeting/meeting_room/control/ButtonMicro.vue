@@ -21,7 +21,7 @@ const { user } = storeToRefs(meetingStore);
             <IconMicroSlash v-else></IconMicroSlash>
             <Tooltip>{{ user.micro ? "Turn off micro" : "Turn on micro" }}</Tooltip>
         </button>
-        <button @click="meetingStore.showDevice({ type: 'mic' })" class="option-device-btn">
+        <button @click="meetingStore.showDevice({ type: 'micro' })" class="option-device-btn">
             <IconArrowUp></IconArrowUp>
         </button>
     </div>

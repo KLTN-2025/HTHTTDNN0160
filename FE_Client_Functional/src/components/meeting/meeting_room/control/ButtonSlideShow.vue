@@ -1,6 +1,7 @@
 <script setup>
 import { useMeetingStore } from '@/stores/meeting/useMeetingStore';
 import IconSlideShow from '../icons/IconSlideShow.vue';
+import Tooltip from '../common/Tooltip.vue';
 import { useSocketStore } from '@/stores/meeting/useSocketStore';
 
 const meetingStore = useMeetingStore();
@@ -12,6 +13,6 @@ const meetingStore = useMeetingStore();
 <template>
     <button @click="meetingStore.shareScreen" class="btn-common slide-show">
         <IconSlideShow></IconSlideShow>
-        <div class="tooltip">Turn On Camera</div>
+        <Tooltip>Slide Show</Tooltip>
     </button>
 </template>

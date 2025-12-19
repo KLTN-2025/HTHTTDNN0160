@@ -67,6 +67,22 @@ export const useSocketStore = defineStore("socketstore", () => {
         socket.value.on("lower-hand-receive", async ({ socketId }) => {
             meetingstore.lowerhandReceive({ socketId })
         });
+
+        socket.value.on("receive-message", ({ message, socketId, time, translated }) => {
+            meetingstore.receiveMessage({ message, socketId, time, translated })
+        });
+
+        socket.value.on("caption-message-receive", ({ socketId, caption }) => {
+            meetingstore.receiveCaption({ socketId, caption })
+        });
+
+        socket.value.on("speaking", (speakingProducers) => {
+            meetingstore.speaking(speakingProducers);
+        });
+
+        socket.value.on("leave-room", ({ socketId }) => {
+            meetingstore.leaveRoomMessage({ socketId });
+        });
     }
 
     const disconnectSocket = async () => {
@@ -129,19 +145,31 @@ export const useSocketStore = defineStore("socketstore", () => {
     }
 
     const showEmoji = (id) => {
-        socket.value.emit("show-emoji", id)
+        socket.value.emit("show-emoji", id);
     }
 
     const eraseEmojiSend = () => {
-        socket.value.emit("erase-emoji")
+        socket.value.emit("erase-emoji");
     }
 
     const raiseHand = () => {
-        socket.value.emit("raise-hand")
+        socket.value.emit("raise-hand");
     }
 
     const lowerHand = () => {
-        socket.value.emit("lower-hand")
+        socket.value.emit("lower-hand");
+    }
+
+    const sendMessage = (message, time, sourceLang) => {
+        socket.value.emit("send-message", message, time, sourceLang);
+    }
+
+    const sendCaption = ({ caption, sourceLang }) => {
+        socket.value.emit("caption-message-send", { caption, sourceLang });
+    }
+
+    const switchLang = (newLang, oldLang) => {
+        socket.value.emit("switch-lang", newLang, oldLang);
     }
 
     return {
@@ -162,6 +190,9 @@ export const useSocketStore = defineStore("socketstore", () => {
         showEmoji,
         eraseEmojiSend,
         raiseHand,
-        lowerHand
+        lowerHand,
+        sendMessage,
+        sendCaption,
+        switchLang,
     }
 })

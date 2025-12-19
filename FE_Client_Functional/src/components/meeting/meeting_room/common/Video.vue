@@ -65,7 +65,7 @@ gradient.value = randomColor();
 </script>
 
 <template>
-    <div class="video-container" :class="dataShareScreen.isSharingScreen ? 'present' : ''">
+    <div v-if="user.isLive" class="video-container" :class="dataShareScreen.isSharingScreen ? 'present' : ''">
         <div v-if="user?.camera" class="video">
             <video ref="videoRef" autoplay playsinline></video>
         </div>
@@ -81,8 +81,9 @@ gradient.value = randomColor();
 
         <!-- <div class="host-user"> (Host) {{ user.socketId === soc }}</div> -->
 
-        <div class="name-user">{{ user?.name }}
-            <IconRaiseHand v-if="user?.raiseHand" style="margin-left: 20px;"></IconRaiseHand>
+        <div class="name-user">
+            <IconRaiseHand v-if="user?.raiseHand" style="margin-right: 20px;"></IconRaiseHand>
+            <span>{{ user?.name }}</span>
         </div>
 
         <div class="icon-audio-stage">

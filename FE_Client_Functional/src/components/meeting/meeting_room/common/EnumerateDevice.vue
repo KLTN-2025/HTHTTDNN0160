@@ -10,63 +10,71 @@ import { useMeetingStore } from '@/stores/meeting/useMeetingStore';
 import { storeToRefs } from 'pinia';
 
 const meetingStore = useMeetingStore();
-const { typeDevice } = storeToRefs(meetingStore);
+const { typeDevice, enumerateDevices, user } = storeToRefs(meetingStore);
 
 const list = ref({});
-
-async function getDevices() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    const mics = devices.filter(d => d.kind === "audioinput");
-
-    const cams = devices.filter(d => d.kind === "videoinput");
-
-    const speakers = devices.filter(d => d.kind === "audiooutput");
-
-    return { mics, cams, speakers };
-}
-
-const enumerateDevices = ref(null);
-
-onMounted(async () => {
-    enumerateDevices.value = await getDevices();
-    console.log(enumerateDevices.value);
-})
+const device = ref("");
+let typeSwitch = "";
+const switching = ref(false);
 
 const showListOption = (type) => {
-    if (type === "cam") {
+    typeSwitch = type
+    if (type === "camera") {
         list.value = enumerateDevices.value.cams;
-    } else if (type === "mic") {
+        device.value = user.value.cam;
+    } else if (type === "micro") {
         list.value = enumerateDevices.value.mics;
+        device.value = user.value.mic;
     } else if (type === "speaker") {
         list.value = enumerateDevices.value.speakers;
+        device.value = user.value.speaker;
     }
 }
 
-watch(typeDevice, async () => {
-    await getDevices();
-})
+const onSwitchDevice = async (deviceId) => {
+    if (switching.value) return;
+    if (deviceId === device.value) return;
+
+    switching.value = true;
+
+    try {
+        const result = await meetingStore.switchDevice({
+            deviceId,
+            type: typeSwitch
+        });
+
+        if (result) {
+            device.value = deviceId;
+        }
+    } finally {
+        switching.value = false;
+    }
+};
 
 </script>
 <template>
     <div class="box-option">
         <button @click="showListOption(typeDevice)" class="box-option-item">
-            <IconMicro v-if="typeDevice === 'mic'"></IconMicro>
+            <IconMicro v-if="typeDevice === 'micro'"></IconMicro>
             <IconCamera v-else></IconCamera>
-            <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate</span>
+            <span>{{
+                typeDevice === 'micro'
+                    ? enumerateDevices?.mics.find(v => v.deviceId === user.mic).label
+                    : enumerateDevices?.cams.find(v => v.deviceId === user.cam).label
+            }}</span>
             <IconArrowUp></IconArrowUp>
         </button>
-        <button @click="showListOption('speaker')" class="box-option-item" v-show="typeDevice === 'mic'">
+        <button @click="showListOption('speaker')" class="box-option-item" v-show="typeDevice === 'micro'">
             <IconSpeaker></IconSpeaker>
-            <span>Lorem ipsum dolor sit amet, consectetur</span>
+            <span>{{enumerateDevices?.speakers.find(v => v.deviceId === user.speaker).label}}</span>
             <IconArrowUp></IconArrowUp>
         </button>
         <button class="btn-setting">
             <IconSetting></IconSetting>
         </button>
         <div class="list-option">
-            <div v-for="value in Object.values(list).filter(v => v.deviceId !== 'default' && v.deviceId !== 'communications')"
-                :key="value.deviceId" class="item">
+            <div @click="onSwitchDevice(value.deviceId)" v-for="value in list" :key="value.deviceId" class="item"
+                :style="{ color: value.deviceId === device ? '#5DA9E9' : '' }">
                 <div class="icon-tick">
                     <IconCamera v-if="value.kind === 'videoinput'"></IconCamera>
                     <IconSpeaker v-else-if="value.kind === 'audiooutput'"></IconSpeaker>
