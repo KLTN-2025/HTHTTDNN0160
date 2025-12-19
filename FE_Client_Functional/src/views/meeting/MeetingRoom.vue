@@ -131,7 +131,7 @@ watch(
 </script>
 
 <template>
-    <section class="main-meeting">
+    <section class="main-meeting" style="background-color: #131314;">
 
         <div class="content-panel">
 
