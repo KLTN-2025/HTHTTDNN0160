@@ -11,8 +11,6 @@ import { mediasoup as mediasoupConfig } from "../mediasoup.config.js";
 
 export const createRouter = async (worker) => {
     /** @type {CustomRouter} */
-    console.log();
-    
     const router = await worker.createRouter({
         mediaCodecs: mediasoupConfig.mediasoup.router.mediaCodecs
     });

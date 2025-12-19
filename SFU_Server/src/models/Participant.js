@@ -31,7 +31,7 @@ export default class Participant {
             if (state === 'failed' || state === 'closed') {
                 transport.close();
             }
-        });                   
+        });
 
         transport.on('iceselectedtuplechange', (tuple) => {
             // console.log(`[ICE SELECTED] ${transport.id}`, tuple);
@@ -88,7 +88,7 @@ export default class Participant {
         });
 
 
-        return producer.id;
+        return producer;
     }
 
     /**
@@ -184,9 +184,20 @@ export default class Participant {
     }
 
     closeAllTransports() {
-        this.transports.forEach(transport => transport.close());
+        this.transports.forEach(transport => {
+            if (transport && !transport.closed) transport.close();
+        });
         this.transports.clear();
+
+        this.producers.forEach(producer => {
+            if (producer && !producer.closed) producer.close();
+        });
         this.producers.clear();
+
+        this.consumers.forEach(consumer => {
+            if (consumer && !consumer.closed) consumer.close();
+        });
         this.consumers.clear();
     }
+
 }

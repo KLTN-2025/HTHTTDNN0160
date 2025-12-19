@@ -12,8 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "async-mutex": "^0.5.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "esbuild": "^0.25.11",
     "express": "^5.1.0",
     "httpolyglot": "^0.1.2",

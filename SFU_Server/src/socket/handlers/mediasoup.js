@@ -64,7 +64,7 @@ export const produce = async ({ transportId, rtpParameters, kind, meetingId, soc
     const meeting = meetings.get(meetingId);
     if (!meeting) return { error: "Meeting not found" };
 
-    const producerId= await meeting.createProducer({
+    const producerId = await meeting.createProducer({
         socketId: socketId,
         transportId,
         rtpParameters,
@@ -108,4 +108,3 @@ export const resume = async ({ socketId, meetingId, consumerId }) => {
 
     await meeting.resumeConsumer({ socketId, consumerId });
 }
-

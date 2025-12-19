@@ -8,6 +8,8 @@ export default class Meeting {
     pipes = new Map();
     pipeLocks = new Map();
 
+    audioLevelObservers = new Map();
+
     /** @type {Map<string, Participant>} */
     participants = new Map();
 
@@ -49,6 +51,8 @@ export default class Meeting {
         },
     };
 
+    userStats = [];
+
     messages = [];
 
     captions = [];
@@ -63,6 +67,21 @@ export default class Meeting {
 
     setParticipant(socketId, routerId) {
         this.participants.set(socketId, new Participant(routerId));
+    }
+
+    async createObserverUser(routerId) {
+        const router = this.getRouter(routerId);
+
+        const audioLevelObserver = await router.createAudioLevelObserver({
+            maxEntries: 3,
+            threshold: -80,
+            interval: 1000
+        });
+
+        this.audioLevelObservers.set(routerId, audioLevelObserver);
+
+        return audioLevelObserver;
+
     }
 
     getDataMeeting() {
@@ -128,13 +147,15 @@ export default class Meeting {
         return await participant.connectTransport({ transportId, dtlsParameters });
     }
 
+
+
     /**
  * @param {{ socket: import("socket.io").Socket }} options
  */
     async createProducer({ socketId, transportId, rtpParameters, kind, appData, socket }) {
         const participant = this.getParticipant(socketId);
 
-        const producerId = await participant.createProducer({
+        const producer = await participant.createProducer({
             transportId,
             rtpParameters,
             kind,
@@ -142,33 +163,39 @@ export default class Meeting {
             socket
         });
 
+        const audioLevelObserver = this.audioLevelObservers.get(participant.routerId);
+
+        if (audioLevelObserver && kind === "audio" && producer.id && appData.source === "micro") {
+            audioLevelObserver.addProducer({ producerId: producer.id });
+        }
+
         const users = this.getDataMeeting().dataUsers;
 
         const user = users.find(user => user.socketId === socketId);
         switch (appData.source) {
             case "camera":
                 user.camera = true;
-                user.producers.camera = producerId;
+                user.producers.camera = producer.id;
                 break;
             case "micro":
                 user.micro = true;
-                user.producers.micro = producerId;
+                user.producers.micro = producer.id;
                 break;
             case "screen-video":
                 this.dataMeeting.shareScreen.socketId = socketId;
                 this.dataMeeting.shareScreen.isSharingScreen = true;
-                this.dataMeeting.shareScreen.producers.video = producerId;
+                this.dataMeeting.shareScreen.producers.video = producer.id;
                 break;
             case "screen-audio":
                 this.dataMeeting.shareScreen.socketId = socketId;
                 this.dataMeeting.shareScreen.isSharingScreen = true;
-                this.dataMeeting.shareScreen.producers.audio = producerId;
+                this.dataMeeting.shareScreen.producers.audio = producer.id;
                 break;
             default:
                 break;
         }
 
-        return producerId;
+        return producer.id;
     }
 
     async createConsumer({ producerId, rtpCapabilities, transportId, kind, socketId, anotherId, appData, socket }) {
@@ -200,13 +227,48 @@ export default class Meeting {
         await participant.resumeConsumer({ consumerId });
     }
 
+    async leaveMeeting(socketId) {
+
+        const participant = this.getParticipant(socketId);
+
+        for (const [key, value] of participant.producers) {
+            await this.closeProducer({ socketId, producerId: key });
+        }
+
+        await participant.closeAllTransports();
+
+        const dataUsers = this.getDataMeeting().dataUsers;
+
+        const index = dataUsers.findIndex(u => u.socketId === socketId);
+        if (index !== -1) {
+            dataUsers[index].isLive = false;
+            dataUsers.splice(index, 1);
+        }
+
+        const routerId = participant.routerId;
+
+        const size = this.participants.size;
+
+        this.participants.delete(socketId);
+
+        return { routerId, size };
+
+    }
+
     async closeProducer({ socketId, producerId }) {
         const participant = this.getParticipant(socketId);
+        const kind = participant.producers.get(producerId).kind;
         const { isSuccess, type } = await participant.closeProducer({ producerId });
         const routerPostId = participant.routerId;
 
         const users = this.getDataMeeting().dataUsers;
         const user = users.find(user => user.socketId === socketId);
+
+        const audioLevelObserver = this.audioLevelObservers.get(participant.routerId);
+
+        if (audioLevelObserver && kind === "audio" && producerId && type.source === "micro") {
+            audioLevelObserver.removeProducer({ producerId });
+        }
 
         switch (type.source) {
             case "camera":
@@ -246,6 +308,4 @@ export default class Meeting {
             }
         }
     }
-
-
 }
