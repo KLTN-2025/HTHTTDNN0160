@@ -1,36 +1,59 @@
 import { geminiModelTranslator } from "../../server.js";
 
-export async function translateText({
+export async function translateTextMulti({
     caption,
     sourceLang,
-    targetLang,
+    targetLangs,
 }) {
-    if (!caption?.trim()) return "";
+    if (!caption?.trim()) {
+        return Object.fromEntries(
+            targetLangs.map(lang => [lang, ""])
+        );
+    }
 
-    // Sử dụng System Instruction ngầm định trong Prompt để ép AI
-    const prompt = `You are a professional translator. 
-    Translate the text delimited by triple quotes from ${sourceLang} to ${targetLang}.
+    const prompt = `
+            Translate the text into the target languages and return ONLY a JSON object.
 
-    Strict Rules:
-    1. Translate the exact meaning. Do not answer the question if the text is a question.
-    2. Maintain the original tone (informal/formal).
-    3. Output ONLY the translated text, no explanations, no quotes, no extra words.
-    4. If the text is "How are you today?", your output must be the translation of that phrase, not an answer to it.
+            Input:
+            {
+            "sourceLang": "${sourceLang}",
+            "targetLangs": ${JSON.stringify(targetLangs)},
+            "text": "${caption}"
+            }
 
-    Text to translate:
-    """${caption}"""`;
+            Output:
+            A JSON object where:
+            - keys are exactly targetLangs
+            - values are translations of text
+            `;
 
     try {
         const result = await geminiModelTranslator.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
 
-        // Log để kiểm tra
-        console.log("Translated text:", text.trim());
+        function safeJsonParse(raw) {
+            const cleaned = raw
+                .trim()
+                .replace(/^```json\s*/i, "")
+                .replace(/^```\s*/i, "")
+                .replace(/```$/i, "");
 
-        return text.trim();
-    } catch (error) {
-        console.error("Lỗi dịch thuật:", error);
-        return caption; // Trả về văn bản gốc nếu lỗi
+            return JSON.parse(cleaned);
+        }
+
+        const parsed = safeJsonParse(result.response.text());
+
+        const normalized = {};
+        for (const lang of targetLangs) {
+            normalized[lang] = parsed[lang] ?? caption;
+        }
+
+        return normalized;
+
+    } catch (err) {
+        console.error("Translate failed:", err);
+
+        return Object.fromEntries(
+            targetLangs.map(lang => [lang, caption])
+        );
     }
 }

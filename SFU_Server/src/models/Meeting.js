@@ -266,9 +266,6 @@ export default class Meeting {
 
         const audioLevelObserver = this.audioLevelObservers.get(participant.routerId);
 
-        if (audioLevelObserver && kind === "audio" && producerId && type.source === "micro") {
-            audioLevelObserver.removeProducer({ producerId });
-        }
 
         switch (type.source) {
             case "camera":

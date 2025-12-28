@@ -16,7 +16,7 @@ import {
     eraseEmoji,
 } from "./handlers/meeting.js";
 
-import { translateText } from "../ai/translate.js";
+import { translateTextMulti } from "../ai/translate.js";
 
 /** 
  * @param {Server} io 
@@ -104,58 +104,48 @@ export const initSocketEvents = (io) => {
         socket.on("send-message", async (message, time, sourceLang) => {
 
             function getActiveLangs(meetingId) {
-                const langs = [];
+                const langs = new Set();
 
                 for (const [roomName, sockets] of io.sockets.adapter.rooms) {
                     if (
                         roomName.startsWith(`${meetingId}:lang:`) &&
                         sockets.size > 0
                     ) {
-                        langs.push(roomName.split(":").pop());
+                        const lang = roomName.split(":").pop();
+                        if (lang !== sourceLang) {
+                            langs.add(lang);
+                        }
                     }
                 }
 
-                return langs;
+                return [...langs];
             }
 
             const langs = getActiveLangs(socket.meetingId);
 
-            for (const lang of langs) {
+            const caption = message;
 
-                if (lang === sourceLang) {
-                    socket.to(`${socket.meetingId}:lang:${lang}`).emit("receive-message", {
-                        message,
-                        socketId: socket.id,
-                        time,
-                        translated: message
-                    });
-                    continue;
-                }
+            const translated = await translateTextMulti({
+                caption,
+                sourceLang,
+                targetLangs: langs,
+            });
+            // original
+            socket.to(`${socket.meetingId}:lang:${sourceLang}`).emit("receive-message", {
+                translated: message,
+                message,
+                time,
+                socketId: socket.id,
+            });
 
-                console.log("langs", langs);
-
-
-                let caption = message;
-
-                const translated = await translateText({
-                    caption,
-                    sourceLang,
-                    targetLang: lang,
-                });
-
-                console.log(translated);
-
-
-                socket.to(`${socket.meetingId}:lang:${lang}`).emit("receive-message", {
+            for (const [key, value] of Object.entries(translated)) {
+                socket.to(`${socket.meetingId}:lang:${key}`).emit("receive-message", {
+                    translated: value,
                     message,
-                    socketId: socket.id,
                     time,
-                    translated: translated
+                    socketId: socket.id,
                 });
             }
-
-
-
         })
 
         socket.on("show-emoji", (id) => {
@@ -216,47 +206,42 @@ export const initSocketEvents = (io) => {
         socket.on("caption-message-send", async ({ caption, sourceLang }) => {
 
             function getActiveLangs(meetingId) {
-                const langs = [];
+                const langs = new Set();
 
                 for (const [roomName, sockets] of io.sockets.adapter.rooms) {
                     if (
                         roomName.startsWith(`${meetingId}:lang:`) &&
                         sockets.size > 0
                     ) {
-                        langs.push(roomName.split(":").pop());
+                        const lang = roomName.split(":").pop();
+                        if (lang !== sourceLang) {
+                            langs.add(lang);
+                        }
                     }
                 }
 
-                return langs;
+                return [...langs];
             }
 
             const langs = getActiveLangs(socket.meetingId);
 
-            for (const lang of langs) {
+            const translated = await translateTextMulti({
+                caption,
+                sourceLang,
+                targetLangs: langs,
+            });
 
-                if (lang === sourceLang) {
-                    socket.to(`${socket.meetingId}:lang:${lang}`).emit("caption-message-receive", {
-                        caption,
-                        socketId: socket.id,
-                    });
-                    continue;
-                }
+            socket.to(`${socket.meetingId}:lang:${sourceLang}`).emit("caption-message-receive", {
+                caption,
+                socketId: socket.id,
+            });
 
-                const translated = await translateText({
-                    caption,
-                    sourceLang,
-                    targetLang: lang,
-                });
-
-                console.log(translated);
-
-
-                socket.to(`${socket.meetingId}:lang:${lang}`).emit("caption-message-receive", {
-                    caption: translated,
+            for (const [key, value] of Object.entries(translated)) {
+                socket.to(`${socket.meetingId}:lang:${key}`).emit("caption-message-receive", {
+                    caption: value,
                     socketId: socket.id,
                 });
             }
-
 
         });
 
