@@ -240,7 +240,7 @@
                         <img src="icons/up-arrow-icon.svg" alt="">
                     </button>
                 </div>
-                <button class="btn-common slide-show">
+                <button id="test" class="btn-common slide-show">
                     <img src="icons/slide-show-icon.svg" alt="">
                     <div class="tooltip">Turn On Camera</div>
                 </button>
@@ -344,7 +344,11 @@
         const infoPanel = document.querySelector(".info-panel");
         const btnMic = document.querySelector("#btn-mic");
         const toogleMic = document.querySelector("#toogle-mic");
+        const test = document.getElementById("test");
 
+        test.addEventListener("click", () => {
+            
+        })
 
         btnEmoji.addEventListener("click", () => {
             emoji.classList.toggle("show-emoji");

@@ -229,18 +229,12 @@ watch(
 
             </div>
             <div class="user-control-section">
-                <button class="btn-common">
-                    <img src="" alt="">
-                    <div class="tooltip">Turn On Camera</div>
-                </button>
+                
                 <ButtonUsers @turn="handleUserClick" :isUser="isUser"></ButtonUsers>
 
                 <ButtonChat @turn="handleChatClick" :isChat="isChat"></ButtonChat>
 
-                <button class="btn-common">
-                    <img src="" alt="">
-                    <div class="tooltip close-edge-right">Turn On Camera</div>
-                </button>
+                
             </div>
         </div>
 

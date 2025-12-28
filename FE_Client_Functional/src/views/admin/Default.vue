@@ -22,10 +22,7 @@ import '@/assets/admin/fonts/material.css';
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
-            <div class="row">
-                <div class="col-6">123</div>
-                <div class="col-6">123</div>
-            </div>
+            <router-view></router-view>
         </div>
     </div>
 

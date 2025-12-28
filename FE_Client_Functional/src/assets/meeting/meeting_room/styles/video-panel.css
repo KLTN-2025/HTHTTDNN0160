@@ -28,6 +28,7 @@
 .main-meeting .video-container.present {
     height: 120px;
     aspect-ratio: auto;
+    width: 200px;
 }
 
 .main-meeting .video-container .video {
